@@ -10,6 +10,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
     'name',
+    'provinsi',
+    'kota',
+    'kecamatan',
     'status',
     'disaster_type',
     'polygon',

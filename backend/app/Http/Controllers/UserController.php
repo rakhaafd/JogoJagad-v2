@@ -3,12 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Services\WilayahService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    public function __construct(private readonly WilayahService $wilayahService)
+    {
+    }
     public function index(Request $request): Response
     {
         if (! $request->user()->isAdmin()) {
@@ -42,10 +46,18 @@ class UserController extends Controller
             'email' => ['sometimes', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
             'password' => ['nullable', 'string', 'min:6'],
             'role' => ['sometimes', 'in:admin,user'],
-            'kecamatan' => ['sometimes', 'string', 'max:255'],
-            'kota' => ['sometimes', 'string', 'max:255'],
-            'provinsi' => ['sometimes', 'string', 'max:255'],
+            'kecamatan' => ['sometimes', 'string', 'max:255', 'required_with:kota,provinsi'],
+            'kota' => ['sometimes', 'string', 'max:255', 'required_with:kecamatan,provinsi'],
+            'provinsi' => ['sometimes', 'string', 'max:255', 'required_with:kecamatan,kota'],
         ]);
+
+        if (isset($data['kecamatan'], $data['kota'], $data['provinsi'])) {
+            $this->assertDomisiliValid(
+                $data['provinsi'],
+                $data['kota'],
+                $data['kecamatan']
+            );
+        }
 
         if (! empty($data['password'])) {
             $data['password'] = Hash::make($data['password']);
@@ -95,10 +107,18 @@ class UserController extends Controller
             'name' => ['sometimes', 'string', 'max:255'],
             'email' => ['sometimes', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
             'password' => ['nullable', 'string', 'min:6'],
-            'kecamatan' => ['sometimes', 'string', 'max:255'],
-            'kota' => ['sometimes', 'string', 'max:255'],
-            'provinsi' => ['sometimes', 'string', 'max:255'],
+            'kecamatan' => ['sometimes', 'string', 'max:255', 'required_with:kota,provinsi'],
+            'kota' => ['sometimes', 'string', 'max:255', 'required_with:kecamatan,provinsi'],
+            'provinsi' => ['sometimes', 'string', 'max:255', 'required_with:kecamatan,kota'],
         ]);
+
+        if (isset($data['kecamatan'], $data['kota'], $data['provinsi'])) {
+            $this->assertDomisiliValid(
+                $data['provinsi'],
+                $data['kota'],
+                $data['kecamatan']
+            );
+        }
 
         if (! empty($data['password'])) {
             $data['password'] = Hash::make($data['password']);
@@ -111,5 +131,12 @@ class UserController extends Controller
         return response([
             'user' => $user->fresh(),
         ]);
+    }
+
+    private function assertDomisiliValid(string $provinsi, string $kota, string $kecamatan): void
+    {
+        if (! $this->wilayahService->isValidDomisili($provinsi, $kota, $kecamatan)) {
+            abort(422, 'Domisili tidak ditemukan di data wilayah.');
+        }
     }
 }
