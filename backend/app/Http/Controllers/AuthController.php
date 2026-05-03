@@ -3,12 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Services\WilayahService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
+    public function __construct(private readonly WilayahService $wilayahService)
+    {
+    }
     public function registerUser(Request $request): Response
     {
         return $this->registerWithRole($request, 'user');
@@ -65,6 +69,14 @@ class AuthController extends Controller
 
         $data = $request->validate($rules);
 
+        if ($role === 'user') {
+            $this->assertDomisiliValid(
+                $data['provinsi'],
+                $data['kota'],
+                $data['kecamatan']
+            );
+        }
+
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
@@ -107,5 +119,12 @@ class AuthController extends Controller
             'user' => $user,
             'token' => $token,
         ]);
+    }
+
+    private function assertDomisiliValid(string $provinsi, string $kota, string $kecamatan): void
+    {
+        if (! $this->wilayahService->isValidDomisili($provinsi, $kota, $kecamatan)) {
+            abort(422, 'Domisili tidak ditemukan di data wilayah.');
+        }
     }
 }

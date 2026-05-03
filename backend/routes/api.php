@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\RegionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -21,4 +22,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/users/{user}', [UserController::class, 'update']);
     Route::delete('/users/{user}', [UserController::class, 'destroy']);
     Route::delete('/users', [UserController::class, 'destroyAll']);
+
+    Route::get('/regions', [RegionController::class, 'index']);
+    Route::get('/regions/{region}', [RegionController::class, 'show']);
+    Route::post('/regions', [RegionController::class, 'store']);
+    Route::put('/regions/{region}', [RegionController::class, 'update']);
 });
