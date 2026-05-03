@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RegionController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\WeatherController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -27,4 +28,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/regions/{region}', [RegionController::class, 'show']);
     Route::post('/regions', [RegionController::class, 'store']);
     Route::put('/regions/{region}', [RegionController::class, 'update']);
+
+    Route::get('/weather/current', [WeatherController::class, 'current']);
 });
