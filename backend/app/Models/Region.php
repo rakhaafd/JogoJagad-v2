@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'provinsi',
     'kota',
     'kecamatan',
+    'kelurahan',
     'status',
     'disaster_type',
     'polygon',
@@ -31,15 +32,5 @@ class Region extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
-    }
-
-    public function disasterReports(): HasMany
-    {
-        return $this->hasMany(DisasterReport::class);
-    }
-
-    public function userNotifications(): HasMany
-    {
-        return $this->hasMany(UserNotification::class);
     }
 }

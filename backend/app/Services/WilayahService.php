@@ -6,9 +6,9 @@ use Illuminate\Support\Facades\Http;
 
 class WilayahService
 {
-    private const BASE_URL = 'https://wilayah.id/api';
+    private const BASE_URL = 'https://www.emsifa.com/api-wilayah-indonesia/api';
 
-    public function isValidDomisili(string $provinsi, string $kota, string $kecamatan): bool
+    public function isValidDomisili(string $provinsi, string $kota, string $kecamatan, string $kelurahan): bool
     {
         $provinceCode = $this->findProvinceCodeByName($provinsi);
         if ($provinceCode === null) {
@@ -20,7 +20,12 @@ class WilayahService
             return false;
         }
 
-        return $this->findDistrictCodeByName($regencyCode, $kecamatan) !== null;
+        $districtCode = $this->findDistrictCodeByName($regencyCode, $kecamatan);
+        if ($districtCode === null) {
+            return false;
+        }
+
+        return $this->findVillageCodeByName($districtCode, $kelurahan) !== null;
     }
 
     private function findProvinceCodeByName(string $name): ?string
@@ -30,9 +35,9 @@ class WilayahService
             return null;
         }
 
-        foreach ($items['data'] ?? [] as $item) {
+        foreach ($items ?? [] as $item) {
             if ($this->normalize($item['name'] ?? '') === $this->normalize($name)) {
-                return $item['code'] ?? null;
+                return $item['id'] ?? null;
             }
         }
 
@@ -46,9 +51,9 @@ class WilayahService
             return null;
         }
 
-        foreach ($items['data'] ?? [] as $item) {
+        foreach ($items ?? [] as $item) {
             if ($this->normalize($item['name'] ?? '') === $this->normalize($name)) {
-                return $item['code'] ?? null;
+                return $item['id'] ?? null;
             }
         }
 
@@ -62,9 +67,25 @@ class WilayahService
             return null;
         }
 
-        foreach ($items['data'] ?? [] as $item) {
+        foreach ($items ?? [] as $item) {
             if ($this->normalize($item['name'] ?? '') === $this->normalize($name)) {
-                return $item['code'] ?? null;
+                return $item['id'] ?? null;
+            }
+        }
+
+        return null;
+    }
+
+    private function findVillageCodeByName(string $districtCode, string $name): ?string
+    {
+        $items = $this->getJson(self::BASE_URL . '/villages/' . $districtCode . '.json');
+        if ($items === null) {
+            return null;
+        }
+
+        foreach ($items ?? [] as $item) {
+            if ($this->normalize($item['name'] ?? '') === $this->normalize($name)) {
+                return $item['id'] ?? null;
             }
         }
 

@@ -10,9 +10,7 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function __construct(private readonly WilayahService $wilayahService)
-    {
-    }
+    public function __construct(private readonly WilayahService $wilayahService) {}
     public function registerUser(Request $request): Response
     {
         return $this->registerWithRole($request, 'user');
@@ -44,8 +42,11 @@ class AuthController extends Controller
 
     public function me(Request $request): Response
     {
+        $user = $request->user()->load(['donations.campaign']);
+
         return response([
-            'user' => $request->user(),
+            'user' => $user,
+            'total_poin' => $user->total_points, // Optional context based on existing logic
         ]);
     }
 
@@ -58,10 +59,12 @@ class AuthController extends Controller
         ];
 
         if ($role === 'user') {
+            $rules['kelurahan'] = ['required', 'string', 'max:255'];
             $rules['kecamatan'] = ['required', 'string', 'max:255'];
             $rules['kota'] = ['required', 'string', 'max:255'];
             $rules['provinsi'] = ['required', 'string', 'max:255'];
         } else {
+            $rules['kelurahan'] = ['nullable', 'string', 'max:255'];
             $rules['kecamatan'] = ['nullable', 'string', 'max:255'];
             $rules['kota'] = ['nullable', 'string', 'max:255'];
             $rules['provinsi'] = ['nullable', 'string', 'max:255'];
@@ -73,7 +76,8 @@ class AuthController extends Controller
             $this->assertDomisiliValid(
                 $data['provinsi'],
                 $data['kota'],
-                $data['kecamatan']
+                $data['kecamatan'],
+                $data['kelurahan']
             );
         }
 
@@ -82,6 +86,7 @@ class AuthController extends Controller
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'role' => $role,
+            'kelurahan' => $data['kelurahan'] ?? null,
             'kecamatan' => $data['kecamatan'] ?? null,
             'kota' => $data['kota'] ?? null,
             'provinsi' => $data['provinsi'] ?? null,
@@ -121,9 +126,9 @@ class AuthController extends Controller
         ]);
     }
 
-    private function assertDomisiliValid(string $provinsi, string $kota, string $kecamatan): void
+    private function assertDomisiliValid(string $provinsi, string $kota, string $kecamatan, string $kelurahan): void
     {
-        if (! $this->wilayahService->isValidDomisili($provinsi, $kota, $kecamatan)) {
+        if (! $this->wilayahService->isValidDomisili($provinsi, $kota, $kecamatan, $kelurahan)) {
             abort(422, 'Domisili tidak ditemukan di data wilayah.');
         }
     }

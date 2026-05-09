@@ -12,9 +12,7 @@ use Illuminate\Support\Facades\Mail;
 
 class RegionController extends Controller
 {
-    public function __construct(private readonly WilayahService $wilayahService)
-    {
-    }
+    public function __construct(private readonly WilayahService $wilayahService) {}
 
     public function index(): Response
     {
@@ -40,6 +38,7 @@ class RegionController extends Controller
             'provinsi' => ['required', 'string', 'max:255'],
             'kota' => ['required', 'string', 'max:255'],
             'kecamatan' => ['required', 'string', 'max:255'],
+            'kelurahan' => ['required', 'string', 'max:255'],
             'status' => ['required', 'in:aman,waspada,bahaya'],
             'description' => ['nullable', 'string'],
             'disaster_type' => ['nullable', 'string', 'max:255'],
@@ -49,14 +48,16 @@ class RegionController extends Controller
         $this->assertDomisiliValid(
             $data['provinsi'],
             $data['kota'],
-            $data['kecamatan']
+            $data['kecamatan'],
+            $data['kelurahan']
         );
 
         $region = Region::create([
-            'name' => $data['provinsi'] . ' - ' . $data['kota'] . ' - ' . $data['kecamatan'],
+            'name' => $data['provinsi'] . ' - ' . $data['kota'] . ' - ' . $data['kecamatan'] . ' - ' . $data['kelurahan'],
             'provinsi' => $data['provinsi'],
             'kota' => $data['kota'],
             'kecamatan' => $data['kecamatan'],
+            'kelurahan' => $data['kelurahan'],
             'status' => $data['status'],
             'disaster_type' => $data['disaster_type'] ?? 'general',
             'polygon' => $data['polygon'] ?? [],
@@ -78,30 +79,32 @@ class RegionController extends Controller
         }
 
         $data = $request->validate([
-            'provinsi' => ['sometimes', 'string', 'max:255', 'required_with:kota,kecamatan'],
-            'kota' => ['sometimes', 'string', 'max:255', 'required_with:provinsi,kecamatan'],
-            'kecamatan' => ['sometimes', 'string', 'max:255', 'required_with:provinsi,kota'],
+            'provinsi' => ['sometimes', 'string', 'max:255', 'required_with:kota,kecamatan,kelurahan'],
+            'kota' => ['sometimes', 'string', 'max:255', 'required_with:provinsi,kecamatan,kelurahan'],
+            'kecamatan' => ['sometimes', 'string', 'max:255', 'required_with:provinsi,kota,kelurahan'],
+            'kelurahan' => ['sometimes', 'string', 'max:255', 'required_with:provinsi,kota,kecamatan'],
             'status' => ['sometimes', 'in:aman,waspada,bahaya'],
             'description' => ['nullable', 'string'],
             'disaster_type' => ['nullable', 'string', 'max:255'],
             'polygon' => ['nullable', 'array'],
         ]);
 
-        if (isset($data['provinsi'], $data['kota'], $data['kecamatan'])) {
+        if (isset($data['provinsi'], $data['kota'], $data['kecamatan'], $data['kelurahan'])) {
             $this->assertDomisiliValid(
                 $data['provinsi'],
                 $data['kota'],
-                $data['kecamatan']
+                $data['kecamatan'],
+                $data['kelurahan']
             );
         }
 
         $region->fill($data);
 
-        if (isset($data['provinsi'], $data['kota'], $data['kecamatan'])) {
-            $region->name = $data['provinsi'] . ' - ' . $data['kota'] . ' - ' . $data['kecamatan'];
+        if (isset($data['provinsi'], $data['kota'], $data['kecamatan'], $data['kelurahan'])) {
+            $region->name = $data['provinsi'] . ' - ' . $data['kota'] . ' - ' . $data['kecamatan'] . ' - ' . $data['kelurahan'];
         }
 
-        $shouldNotify = $region->isDirty(['status', 'description', 'provinsi', 'kota', 'kecamatan']);
+        $shouldNotify = $region->isDirty(['status', 'description', 'provinsi', 'kota', 'kecamatan', 'kelurahan']);
         $region->save();
 
         if ($shouldNotify) {
@@ -113,9 +116,36 @@ class RegionController extends Controller
         ]);
     }
 
-    private function assertDomisiliValid(string $provinsi, string $kota, string $kecamatan): void
+    public function destroy(Request $request, Region $region): Response
     {
-        if (! $this->wilayahService->isValidDomisili($provinsi, $kota, $kecamatan)) {
+        if (! $request->user()->isAdmin()) {
+            return response(['message' => 'Forbidden.'], 403);
+        }
+
+        $region->delete();
+
+        return response([
+            'message' => 'Region deleted.',
+        ]);
+    }
+
+    public function destroyAll(Request $request): Response
+    {
+        if (! $request->user()->isAdmin()) {
+            return response(['message' => 'Forbidden.'], 403);
+        }
+
+        $deleted = Region::query()->delete();
+
+        return response([
+            'message' => 'All regions deleted.',
+            'deleted' => $deleted,
+        ]);
+    }
+
+    private function assertDomisiliValid(string $provinsi, string $kota, string $kecamatan, string $kelurahan): void
+    {
+        if (! $this->wilayahService->isValidDomisili($provinsi, $kota, $kecamatan, $kelurahan)) {
             abort(422, 'Domisili tidak ditemukan di data wilayah.');
         }
     }
@@ -127,6 +157,7 @@ class RegionController extends Controller
             ->where('provinsi', $region->provinsi)
             ->where('kota', $region->kota)
             ->where('kecamatan', $region->kecamatan)
+            ->where('kelurahan', $region->kelurahan)
             ->select(['id', 'name', 'email'])
             ->chunkById(100, function ($users) use ($region) {
                 foreach ($users as $user) {

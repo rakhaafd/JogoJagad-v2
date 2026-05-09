@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->string('role')->default('user')->after('password');
-            $table->string('kecamatan')->nullable()->after('role');
+            $table->string('kelurahan')->nullable()->after('role');
+            $table->string('kecamatan')->nullable()->after('kelurahan');
             $table->string('kota')->nullable()->after('kecamatan');
             $table->string('provinsi')->nullable()->after('kota');
         });
@@ -25,7 +26,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['role', 'kecamatan', 'kota', 'provinsi']);
+            $table->dropColumn(['role', 'kelurahan', 'kecamatan', 'kota', 'provinsi']);
         });
     }
 };

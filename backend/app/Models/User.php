@@ -12,12 +12,19 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-#[Fillable(['name', 'email', 'password', 'role', 'kecamatan', 'kota', 'provinsi'])]
+#[Fillable(['name', 'email', 'password', 'role', 'kelurahan', 'kecamatan', 'kota', 'provinsi'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
+
+    protected $appends = ['total_points'];
+
+    public function getTotalPointsAttribute(): int
+    {
+        return (int) $this->points()->sum('points');
+    }
 
     /**
      * Get the attributes that should be cast.
@@ -37,10 +44,6 @@ class User extends Authenticatable
         return $this->hasMany(Region::class, 'created_by');
     }
 
-    public function disasterReports(): HasMany
-    {
-        return $this->hasMany(DisasterReport::class);
-    }
 
     public function actions(): HasMany
     {
@@ -57,29 +60,9 @@ class User extends Authenticatable
         return $this->hasMany(Point::class);
     }
 
-    public function donations(): HasMany
-    {
-        return $this->hasMany(Donation::class);
-    }
-
     public function news(): HasMany
     {
         return $this->hasMany(News::class, 'author_id');
-    }
-
-    public function comments(): HasMany
-    {
-        return $this->hasMany(Comment::class);
-    }
-
-    public function likes(): HasMany
-    {
-        return $this->hasMany(Like::class);
-    }
-
-    public function userNotifications(): HasMany
-    {
-        return $this->hasMany(UserNotification::class);
     }
 
     public function isAdmin(): bool
