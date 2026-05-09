@@ -5,22 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
-    'author_id',
     'title',
-    'category',
-    'content',
-    'thumbnail_path',
+    'description',
+    'image_path',
+    'target_amount',
+    'current_amount',
 ])]
-class News extends Model
+class DonationCampaign extends Model
 {
     use HasFactory;
 
-    public function author(): BelongsTo
+    public function donations(): HasMany
     {
-        return $this->belongsTo(User::class, 'author_id');
+        return $this->hasMany(Donation::class);
     }
 }

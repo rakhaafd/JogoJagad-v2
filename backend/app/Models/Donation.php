@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable([
     'user_id',
+    'donation_campaign_id',
     'amount',
     'currency',
     'status',
@@ -30,5 +31,10 @@ class Donation extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function campaign(): BelongsTo
+    {
+        return $this->belongsTo(DonationCampaign::class, 'donation_campaign_id');
     }
 }

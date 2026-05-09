@@ -14,10 +14,11 @@ return new class extends Migration
         Schema::create('actions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->string('title');
             $table->string('action_type');
             $table->text('description')->nullable();
             $table->string('photo_path')->nullable();
-            $table->string('status')->default('pending');
+            $table->enum('status', ['pending', 'verified', 'rejected'])->default('pending');
             $table->timestamps();
 
             $table->index(['user_id', 'status']);

@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 #[Fillable([
     'user_id',
+    'title',
     'action_type',
     'description',
     'photo_path',

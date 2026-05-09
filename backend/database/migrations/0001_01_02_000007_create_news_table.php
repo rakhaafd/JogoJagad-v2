@@ -15,15 +15,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('author_id')->constrained('users')->cascadeOnDelete();
             $table->string('title');
-            $table->string('slug')->unique();
-            $table->text('excerpt')->nullable();
+            $table->string('category');
             $table->longText('content');
-            $table->string('cover_image')->nullable();
-            $table->string('status')->default('draft');
-            $table->timestamp('published_at')->nullable();
+            $table->string('thumbnail_path')->nullable();
             $table->timestamps();
-
-            $table->index(['status', 'published_at']);
         });
     }
 

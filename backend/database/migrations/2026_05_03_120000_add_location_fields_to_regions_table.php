@@ -15,8 +15,10 @@ return new class extends Migration
             $table->string('provinsi')->after('name');
             $table->string('kota')->after('provinsi');
             $table->string('kecamatan')->after('kota');
+            $table->string('kelurahan')->after('kecamatan');
 
-            $table->index(['provinsi', 'kota', 'kecamatan']);
+            $table->index(['provinsi', 'kota', 'kecamatan'], 'regions_location_index');
+            $table->index('kelurahan');
             $table->index('status');
         });
     }
@@ -27,9 +29,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('regions', function (Blueprint $table) {
-            $table->dropIndex(['provinsi', 'kota', 'kecamatan']);
+            $table->dropIndex('regions_location_index');
+            $table->dropIndex(['kelurahan']);
             $table->dropIndex(['status']);
-            $table->dropColumn(['provinsi', 'kota', 'kecamatan']);
+            $table->dropColumn(['provinsi', 'kota', 'kecamatan', 'kelurahan']);
         });
     }
 };
