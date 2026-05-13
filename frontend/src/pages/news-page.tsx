@@ -4,33 +4,62 @@ import { Badge } from "../components/ui/badge";
 import { Card } from "../components/ui/card";
 import { CommentThread } from "../fragments/news/comment-thread";
 import { FeaturedArticle } from "../fragments/news/featured-article";
-import { newsList } from "../services/mock-data";
+import { EmptyState } from "../components/shared/empty-state";
+import { Skeleton } from "../components/ui/skeleton";
+import { useApi } from "../composables/useApi";
+import { newsService } from "../services/newsService";
 
 export function NewsPage() {
-  const nonFeatured = newsList.filter((item) => !item.featured);
+  const { data: news = [], loading, error } = useApi(newsService.list);
+  const featured = news[0] ?? null;
+  const nonFeatured = news.slice(1);
+
   return (
     <div className="space-y-4">
       <PageHeader
         title="Disaster News"
         description="Curated updates, regional insights, and community-driven discussions."
       />
-      <FeaturedArticle />
+      {loading ? (
+        <Card className="space-y-3">
+          <Skeleton className="h-6 w-28" />
+          <Skeleton className="h-5 w-full" />
+          <Skeleton className="h-5 w-2/3" />
+        </Card>
+      ) : error ? (
+        <EmptyState title="Failed to load news" message={error} />
+      ) : (
+        <FeaturedArticle article={featured} />
+      )}
+
       <div className="grid gap-4 md:grid-cols-2">
-        {nonFeatured.map((article, index) => (
-          <motion.div
-            key={article.id}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.08 }}
-          >
-            <Card>
-              <Badge>{article.category}</Badge>
-              <h3 className="mt-2 font-semibold">{article.title}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">{article.excerpt}</p>
-              <p className="mt-2 text-xs text-muted-foreground">{article.publishedAt}</p>
-            </Card>
-          </motion.div>
-        ))}
+        {loading
+          ? Array.from({ length: 4 }).map((_, index) => (
+              <Card key={`news-card-${index}`} className="space-y-2">
+                <Skeleton className="h-5 w-16" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-2/3" />
+              </Card>
+            ))
+          : nonFeatured.map((article, index) => (
+              <motion.div
+                key={article.id}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.08 }}
+              >
+                <Card>
+                  <Badge>{article.category}</Badge>
+                  <h3 className="mt-2 font-semibold">{article.title}</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {article.content.slice(0, 120)}...
+                  </p>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    {new Date(article.created_at).toLocaleDateString("id-ID")}
+                  </p>
+                </Card>
+              </motion.div>
+            ))}
       </div>
       <CommentThread />
     </div>

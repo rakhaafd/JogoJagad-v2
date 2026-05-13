@@ -1,33 +1,65 @@
 import { CloudRain, HandCoins, ShieldAlert, Trophy } from "lucide-react";
-import { landingStats } from "../../services/mock-data";
 import { formatCurrency, formatNumber } from "../../utils/format";
 import { StatCard } from "../../components/shared/stat-card";
+import { Skeleton } from "../../components/ui/skeleton";
+import { useApi } from "../../composables/useApi";
+import { disasterService } from "../../services/disasterService";
+import { donationService } from "../../services/donationService";
+import { newsService } from "../../services/newsService";
+import { useCallback } from "react";
 
 export function StatsSection() {
+  const { data: regions = [], loading: regionsLoading } = useApi(
+    disasterService.regions,
+  );
+  const campaignsFetcher = useCallback(
+    () => donationService.listCampaigns(false),
+    [],
+  );
+  const { data: campaigns = [], loading: campaignsLoading } =
+    useApi(campaignsFetcher);
+  const { data: news = [], loading: newsLoading } = useApi(newsService.list);
+
+  const alerts = regions.filter((region) => region.status !== "aman").length;
+  const totalDonations = campaigns.reduce(
+    (sum, campaign) => sum + campaign.current_amount,
+    0,
+  );
+
+  if (regionsLoading || campaignsLoading || newsLoading) {
+    return (
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <Skeleton key={`stat-${index}`} className="h-24 w-full" />
+        ))}
+      </section>
+    );
+  }
+
   return (
     <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <StatCard
-        title={landingStats[0].label}
-        value={formatNumber(landingStats[0].value)}
+        title="Monitored Regions"
+        value={formatNumber(regions.length)}
         subtitle="Active GIS regions"
         icon={ShieldAlert}
       />
       <StatCard
-        title={landingStats[1].label}
-        value={formatNumber(landingStats[1].value)}
-        subtitle="Geo-targeted notification events"
+        title="Active Alerts"
+        value={formatNumber(alerts)}
+        subtitle="Regions with warnings"
         icon={CloudRain}
       />
       <StatCard
-        title={landingStats[2].label}
-        value={formatNumber(landingStats[2].value)}
-        subtitle="Community prevention proof"
+        title="Published News"
+        value={formatNumber(news.length)}
+        subtitle="Verified newsroom updates"
         icon={Trophy}
       />
       <StatCard
-        title={landingStats[3].label}
-        value={formatCurrency(landingStats[3].value)}
-        subtitle="Total social impact donations"
+        title="Donation Collected"
+        value={formatCurrency(totalDonations)}
+        subtitle="Live campaign totals"
         icon={HandCoins}
       />
     </section>

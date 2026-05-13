@@ -1,4 +1,4 @@
-import { api } from "./api";
+import { apiFetch } from "./api";
 
 interface AskPayload {
   question: string;
@@ -21,20 +21,28 @@ export interface QuizItem {
 
 export const aiService = {
   async ask(payload: AskPayload) {
-    const { data } = await api.post<{ answer: string }>("/ai/ask", payload);
+    const data = await apiFetch<{ answer: string }>("/ai/ask", {
+      method: "POST",
+      body: payload,
+    });
     return data.answer;
   },
 
   async generateQuiz(payload: GenerateQuizPayload) {
-    const { data } = await api.post<{ quizzes: QuizItem[] }>("/ai/quiz/generate", payload);
+    const data = await apiFetch<{ quizzes: QuizItem[] }>("/ai/quiz/generate", {
+      method: "POST",
+      body: payload,
+    });
     return data.quizzes;
   },
 
   async submit(payload: SubmitQuizPayload) {
-    const { data } = await api.post<{ message: string; points_awarded?: number }>(
+    return apiFetch<{ message: string; points_awarded?: number }>(
       "/ai/quiz/submit",
-      payload,
+      {
+        method: "POST",
+        body: payload,
+      },
     );
-    return data;
   },
 };

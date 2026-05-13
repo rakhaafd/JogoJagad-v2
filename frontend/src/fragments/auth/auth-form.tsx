@@ -1,9 +1,20 @@
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import type { FormEvent } from "react";
+import { useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../../components/ui/button";
 import { Card } from "../../components/ui/card";
-import { FormField } from "../../components/ui/form-field";
-import { Input } from "../../components/ui/input";
+import { DynamicForm } from "../../components/shared/dynamic-form";
+import { useMutation } from "../../composables/useMutation";
+import { useAuth } from "../../hooks/useAuth";
+import { useToast } from "../../components/ui/toast";
+import { buildFormFields } from "../../utils/form";
+import type {
+  FormFieldConfig,
+  LoginPayload,
+  RegisterPayload,
+  UserRole,
+} from "../../types";
 
 interface AuthFormProps {
   mode: "login" | "register";
@@ -11,37 +22,151 @@ interface AuthFormProps {
 
 export function AuthForm({ mode }: AuthFormProps) {
   const isLogin = mode === "login";
+  const navigate = useNavigate();
+  const { login, register } = useAuth();
+  const { pushToast } = useToast();
+  const [formValues, setFormValues] = useState({
+    role: "user" as UserRole,
+    name: "",
+    email: "",
+    password: "",
+    provinsi: "",
+    kota: "",
+    kecamatan: "",
+    kelurahan: "",
+  });
+
+  const loginMutation = useMutation<void, LoginPayload>(login);
+  const registerMutation = useMutation<void, RegisterPayload>(register);
+  const mutation = isLogin ? loginMutation : registerMutation;
+
+  const fields = useMemo<FormFieldConfig[]>(() => {
+    if (isLogin) {
+      return buildFormFields(
+        {
+          role: formValues.role,
+          email: formValues.email,
+          password: formValues.password,
+        },
+        {
+          role: {
+            type: "select",
+            label: "Role",
+            options: [
+              { label: "User", value: "user" },
+              { label: "Admin", value: "admin" },
+            ],
+          },
+          password: { type: "password", autoComplete: "current-password" },
+          email: { type: "email", autoComplete: "email" },
+        },
+      );
+    }
+
+    const basePayload = {
+      role: formValues.role,
+      name: formValues.name,
+      email: formValues.email,
+      password: formValues.password,
+      provinsi: formValues.provinsi,
+      kota: formValues.kota,
+      kecamatan: formValues.kecamatan,
+      kelurahan: formValues.kelurahan,
+    };
+
+    const fieldOverrides: Record<string, Partial<FormFieldConfig>> = {
+      role: {
+        type: "select",
+        label: "Role",
+        options: [
+          { label: "User", value: "user" },
+          { label: "Admin", value: "admin" },
+        ],
+      },
+      password: { type: "password", autoComplete: "new-password" },
+      email: { type: "email", autoComplete: "email" },
+    };
+
+    const generated = buildFormFields(basePayload, fieldOverrides);
+    return formValues.role === "admin"
+      ? generated.filter((field) =>
+          ["role", "name", "email", "password"].includes(field.name),
+        )
+      : generated;
+  }, [formValues, isLogin]);
+
+  const handleChange = (name: keyof typeof formValues, value: unknown) => {
+    setFormValues((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    try {
+      if (isLogin) {
+        await loginMutation.mutate({
+          role: formValues.role,
+          email: formValues.email,
+          password: formValues.password,
+        });
+      } else {
+        await registerMutation.mutate({
+          role: formValues.role,
+          name: formValues.name,
+          email: formValues.email,
+          password: formValues.password,
+          provinsi:
+            formValues.role === "user" ? formValues.provinsi : undefined,
+          kota: formValues.role === "user" ? formValues.kota : undefined,
+          kecamatan:
+            formValues.role === "user" ? formValues.kecamatan : undefined,
+          kelurahan:
+            formValues.role === "user" ? formValues.kelurahan : undefined,
+        });
+      }
+
+      pushToast(
+        isLogin ? "Signed in successfully." : "Account created successfully.",
+      );
+      navigate("/dashboard");
+    } catch {
+      pushToast("Please review the form and try again.", "info");
+    }
+  };
 
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
       <Card className="space-y-5">
         <div>
-          <h1 className="text-2xl font-semibold">{isLogin ? "Welcome Back" : "Create Account"}</h1>
+          <h1 className="text-2xl font-semibold">
+            {isLogin ? "Welcome Back" : "Create Account"}
+          </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {isLogin
               ? "Sign in to continue monitoring and response operations."
               : "Join JogoJagad and start contributing preventive actions."}
           </p>
         </div>
-        <form className="space-y-3">
-          {!isLogin ? (
-            <FormField label="Full Name">
-              <Input placeholder="Full name" />
-            </FormField>
-          ) : null}
-          <FormField label="Email">
-            <Input type="email" placeholder="Email address" />
-          </FormField>
-          <FormField label="Password">
-            <Input type="password" placeholder="Password" />
-          </FormField>
-          {!isLogin ? (
-            <FormField label="Confirm Password">
-              <Input type="password" placeholder="Confirm password" />
-            </FormField>
-          ) : null}
-          <Button className="w-full">{isLogin ? "Sign In" : "Create Account"}</Button>
-        </form>
+        <DynamicForm
+          fields={fields}
+          values={formValues}
+          onChange={handleChange}
+          onSubmit={handleSubmit}
+          errors={mutation.validationErrors}
+          disabled={mutation.loading}
+          actions={
+            <Button
+              className="w-full"
+              type="submit"
+              disabled={mutation.loading}
+            >
+              {mutation.loading
+                ? "Processing..."
+                : isLogin
+                  ? "Sign In"
+                  : "Create Account"}
+            </Button>
+          }
+        />
         <p className="text-sm text-muted-foreground">
           {isLogin ? "New to JogoJagad?" : "Already have an account?"}{" "}
           <Link

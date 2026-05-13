@@ -9,7 +9,7 @@ export interface ApiSuccessResponse<T> {
 }
 
 export interface ApiState<T> {
-  data: T | null;
+  data: T | null | undefined;
   loading: boolean;
   error: string | null;
 }

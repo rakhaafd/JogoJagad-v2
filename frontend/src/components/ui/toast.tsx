@@ -56,8 +56,11 @@ export function ToastProvider({ children }: PropsWithChildren) {
               <p className="flex-1">{toast.message}</p>
               <button
                 className="rounded p-1 text-muted-foreground hover:bg-muted"
+                aria-label="Dismiss notification"
                 onClick={() =>
-                  setToasts((prev) => prev.filter((item) => item.id !== toast.id))
+                  setToasts((prev) =>
+                    prev.filter((item) => item.id !== toast.id),
+                  )
                 }
               >
                 <X className="h-4 w-4" />
