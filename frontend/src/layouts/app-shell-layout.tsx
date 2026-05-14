@@ -13,8 +13,13 @@ function AppNav({ onNavigate }: { onNavigate?: () => void }) {
   const { user } = useAuth();
 
   const items = appNavigation.filter((item) => {
+    if (!user) return false;
+
+    if (item.path === "/dashboard") return user.role === "user";
+
     // only show admin link to admin users
-    if (item.path === "/admin") return !!user && user.role === "admin";
+    if (item.path === "/admin") return user.role === "admin";
+
     return true;
   });
 
@@ -51,9 +56,9 @@ export function AppShellLayout() {
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto flex max-w-[1600px] gap-4 p-4">
-        <aside className="glass hidden w-72 rounded-2xl border border-border/60 p-4 shadow-soft lg:block">
+        <aside className="glass hidden w-72 rounded-2xl border border-border/60 p-4 shadow-soft lg:block sticky top-0 self-start h-screen overflow-hidden">
           <div className="flex h-full flex-col">
-            <div>
+            <div className="flex-1 overflow-y-auto pr-1">
               <p className="mb-4 text-lg font-semibold">
                 Jogo<span className="text-primary">Jagad</span>
               </p>
@@ -117,11 +122,11 @@ export function AppShellLayout() {
               initial={{ x: -280 }}
               animate={{ x: 0 }}
               exit={{ x: -280 }}
-              className="h-full w-72 bg-card p-4 shadow-soft"
+              className="h-screen w-72 bg-card p-4 shadow-soft"
               onClick={(event) => event.stopPropagation()}
             >
               <div className="flex h-full flex-col">
-                <div>
+                <div className="flex-1 overflow-y-auto pr-1">
                   <p className="mb-4 text-lg font-semibold">
                     Jogo<span className="text-primary">Jagad</span>
                   </p>

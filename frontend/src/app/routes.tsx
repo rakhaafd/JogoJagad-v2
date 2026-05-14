@@ -19,12 +19,7 @@ export function AppRoutes() {
     <Routes>
       <Route element={<MarketingLayout />}>
         <Route index element={<LandingPage />} />
-        <Route path="/map" element={<MapMonitoringPage />} />
-        <Route path="/news" element={<NewsPage />} />
-        <Route path="/donation" element={<DonationPage />} />
-        <Route path="/ai-quiz" element={<AIQuizPage />} />
       </Route>
-
       <Route element={<AppShellLayout />}>
         <Route
           path="/dashboard"
@@ -34,6 +29,10 @@ export function AppRoutes() {
             </AuthGuard>
           }
         />
+        <Route path="/map" element={<MapMonitoringPage />} />
+        <Route path="/news" element={<NewsPage />} />
+        <Route path="/donation" element={<DonationPage />} />
+        <Route path="/ai-quiz" element={<AIQuizPage />} />
         <Route
           path="/admin"
           element={
