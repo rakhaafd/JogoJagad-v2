@@ -79,4 +79,33 @@ export const disasterService = {
       action: ActionListResponse["actions"][number];
     }>(`/admin/actions/${id}/verify`, { method: "POST", body: payload });
   },
+
+  async actionDetail(id: number) {
+    const data = await apiFetch<{
+      action: ActionListResponse["actions"][number];
+    }>(`/actions/${id}`);
+    return data.action;
+  },
+
+  async updateAction(id: number, payload: Partial<ActionCreatePayload>) {
+    const formData = new FormData();
+    if (payload.title) formData.append("title", payload.title);
+    if (payload.action_type)
+      formData.append("action_type", payload.action_type);
+    if (payload.description)
+      formData.append("description", payload.description);
+    if (payload.photo) formData.append("photo", payload.photo);
+    formData.append("_method", "PUT");
+
+    const data = await apiFetch<{
+      action: ActionListResponse["actions"][number];
+    }>(`/actions/${id}`, { method: "POST", body: formData });
+    return data.action;
+  },
+
+  async deleteAction(id: number) {
+    return apiFetch<{ message: string }>(`/actions/${id}`, {
+      method: "DELETE",
+    });
+  },
 };

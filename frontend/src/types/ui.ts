@@ -34,3 +34,9 @@ export interface TableColumn<T> {
   align?: "left" | "right" | "center";
   render?: (value: unknown, row: T) => ReactNode;
 }
+
+export interface NavItem {
+  label: string;
+  path: string;
+  icon: string;
+}

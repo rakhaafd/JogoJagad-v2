@@ -3,10 +3,12 @@ import {
   Heart,
   House,
   LayoutDashboard,
+  List,
   Map,
   Newspaper,
   Satellite,
   ShieldCheck,
+  Siren,
   Wallet,
   type LucideIcon,
 } from "lucide-react";
@@ -22,4 +24,6 @@ export const navIconMap: Record<string, LucideIcon> = {
   satellite: Satellite,
   wallet: Wallet,
   bot: Bot,
+  siren: Siren,
+  list: List,
 };

@@ -1,4 +1,4 @@
-import type { NavItem } from "../types";
+import type { NavItem } from "../types/ui";
 
 export const publicNavigation: NavItem[] = [
   { label: "Home", path: "/", icon: "house" },
@@ -10,6 +10,7 @@ export const publicNavigation: NavItem[] = [
 
 export const appNavigation: NavItem[] = [
   { label: "User Dashboard", path: "/dashboard", icon: "layout-dashboard" },
+  { label: "Action History", path: "/actions", icon: "list" },
   { label: "Admin Dashboard", path: "/admin", icon: "shield-check" },
   { label: "Map Monitor", path: "/map", icon: "satellite" },
   { label: "News", path: "/news", icon: "newspaper" },

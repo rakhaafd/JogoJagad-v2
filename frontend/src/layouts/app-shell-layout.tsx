@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu } from "lucide-react";
+import { LogOut, Menu } from "lucide-react";
 import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { navIconMap } from "../components/shared/nav-icons";
@@ -16,6 +16,8 @@ function AppNav({ onNavigate }: { onNavigate?: () => void }) {
     if (!user) return false;
 
     if (item.path === "/dashboard") return user.role === "user";
+    if (item.path === "/hazard-report") return user.role === "user";
+    if (item.path === "/actions") return user.role === "user";
 
     // only show admin link to admin users
     if (item.path === "/admin") return user.role === "admin";
@@ -66,14 +68,11 @@ export function AppShellLayout() {
             </div>
 
             <div className="mt-auto">
-              <div className="py-3">
-                <ThemeToggle />
-              </div>
               {isAuthenticated ? (
                 <div className="pt-2">
                   <Button
                     variant="ghost"
-                    className="w-full justify-start"
+                    className="w-full justify-start gap-3"
                     onClick={async () => {
                       try {
                         await logout();
@@ -82,6 +81,7 @@ export function AppShellLayout() {
                       }
                     }}
                   >
+                    <LogOut className="h-4 w-4" />
                     Logout
                   </Button>
                 </div>
@@ -134,14 +134,11 @@ export function AppShellLayout() {
                 </div>
 
                 <div className="mt-auto">
-                  <div className="py-3">
-                    <ThemeToggle />
-                  </div>
                   {isAuthenticated ? (
                     <div className="pt-2">
                       <Button
                         variant="ghost"
-                        className="w-full justify-start"
+                        className="w-full justify-start gap-3"
                         onClick={async () => {
                           try {
                             await logout();
@@ -151,6 +148,7 @@ export function AppShellLayout() {
                           }
                         }}
                       >
+                        <LogOut className="h-4 w-4" />
                         Logout
                       </Button>
                     </div>

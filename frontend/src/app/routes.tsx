@@ -4,7 +4,10 @@ import { AuthLayout } from "../layouts/auth-layout";
 import { MarketingLayout } from "../layouts/marketing-layout";
 import { AdminDashboardPage } from "../pages/admin-dashboard-page";
 import { AIQuizPage } from "../pages/ai-quiz-page";
+import { ActionDetailPage } from "../pages/action-detail-page";
+import { ActionHistoryPage } from "../pages/action-history-page";
 import { DonationPage } from "../pages/donation-page";
+import { HazardReportPage } from "../pages/hazard-report-page";
 import { LandingPage } from "../pages/landing-page";
 import { LoginPage } from "../pages/login-page";
 import { MapMonitoringPage } from "../pages/map-monitoring-page";
@@ -30,9 +33,33 @@ export function AppRoutes() {
             </AuthGuard>
           }
         />
+        <Route
+          path="/actions"
+          element={
+            <AuthGuard allow={["user"]}>
+              <ActionHistoryPage />
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/actions/:id"
+          element={
+            <AuthGuard allow={["user"]}>
+              <ActionDetailPage />
+            </AuthGuard>
+          }
+        />
         <Route path="/map" element={<MapMonitoringPage />} />
         <Route path="/news" element={<NewsPage />} />
         <Route path="/news/:id" element={<NewsDetailPage />} />
+        <Route
+          path="/hazard-report"
+          element={
+            <AuthGuard allow={["user"]}>
+              <HazardReportPage />
+            </AuthGuard>
+          }
+        />
         <Route path="/donation" element={<DonationPage />} />
         <Route path="/ai-quiz" element={<AIQuizPage />} />
         <Route
