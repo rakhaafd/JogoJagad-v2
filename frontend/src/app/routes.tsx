@@ -9,6 +9,7 @@ import { LandingPage } from "../pages/landing-page";
 import { LoginPage } from "../pages/login-page";
 import { MapMonitoringPage } from "../pages/map-monitoring-page";
 import { NewsPage } from "../pages/news-page";
+import { NewsDetailPage } from "../pages/news-detail-page";
 import { NotFoundPage } from "../pages/not-found-page";
 import { RegisterPage } from "../pages/register-page";
 import { UserDashboardPage } from "../pages/user-dashboard-page";
@@ -31,6 +32,7 @@ export function AppRoutes() {
         />
         <Route path="/map" element={<MapMonitoringPage />} />
         <Route path="/news" element={<NewsPage />} />
+        <Route path="/news/:id" element={<NewsDetailPage />} />
         <Route path="/donation" element={<DonationPage />} />
         <Route path="/ai-quiz" element={<AIQuizPage />} />
         <Route

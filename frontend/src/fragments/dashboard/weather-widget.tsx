@@ -8,6 +8,9 @@ export function WeatherWidget() {
   const { data, loading, error } = useApi(weatherService.current);
   const weather = data?.weather;
   const mainCondition = weather?.weather?.[0]?.main ?? "Unknown";
+  // OpenWeatherMap returns temperature in Kelvin by default — convert to °C
+  const tempKelvin = weather?.main?.temp ?? 0;
+  const tempCelsius = Math.round(tempKelvin - 273.15);
 
   return (
     <Card glass>
@@ -24,9 +27,7 @@ export function WeatherWidget() {
           <p className="text-sm text-muted-foreground">{data.city}</p>
           <div className="mt-2 flex items-end justify-between">
             <div>
-              <h3 className="text-4xl font-semibold">
-                {Math.round(weather?.main?.temp ?? 0)}°C
-              </h3>
+              <h3 className="text-4xl font-semibold">{tempCelsius}°C</h3>
               <p className="text-sm text-muted-foreground">{mainCondition}</p>
             </div>
             <CloudRain className="h-10 w-10 text-primary" />

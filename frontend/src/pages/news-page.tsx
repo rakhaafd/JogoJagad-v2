@@ -1,8 +1,9 @@
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import { PageHeader } from "../components/shared/page-header";
 import { Badge } from "../components/ui/badge";
 import { Card } from "../components/ui/card";
-import { CommentThread } from "../fragments/news/comment-thread";
+// CommentThread removed — community discussion disabled
 import { FeaturedArticle } from "../fragments/news/featured-article";
 import { EmptyState } from "../components/shared/empty-state";
 import { Skeleton } from "../components/ui/skeleton";
@@ -48,20 +49,21 @@ export function NewsPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.08 }}
               >
-                <Card>
-                  <Badge>{article.category}</Badge>
-                  <h3 className="mt-2 font-semibold">{article.title}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {article.content.slice(0, 120)}...
-                  </p>
-                  <p className="mt-2 text-xs text-muted-foreground">
-                    {new Date(article.created_at).toLocaleDateString("id-ID")}
-                  </p>
-                </Card>
+                <Link to={`/news/${article.id}`} className="block">
+                  <Card>
+                    <Badge>{article.category}</Badge>
+                    <h3 className="mt-2 font-semibold">{article.title}</h3>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {article.content.slice(0, 120)}...
+                    </p>
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      {new Date(article.created_at).toLocaleDateString("id-ID")}
+                    </p>
+                  </Card>
+                </Link>
               </motion.div>
             ))}
       </div>
-      <CommentThread />
     </div>
   );
 }
