@@ -14,38 +14,45 @@ import { useAuth } from "../hooks/useAuth";
 
 export function UserDashboardPage() {
   const { user } = useAuth();
+
   const {
-    data: regions = [],
+    data: regions,
     loading: regionsLoading,
     error: regionsError,
   } = useApi(disasterService.regions);
-  const { data: donationHistory = [] } = useApi(donationService.history);
+
+  const { data: donationHistory } = useApi(donationService.history);
+
+  const regionList = regions ?? [];
+  const donationList = donationHistory ?? [];
 
   const relevantRegions = user
-    ? regions.filter(
+    ? regionList.filter(
         (region) =>
           region.provinsi === user.provinsi &&
           region.kota === user.kota &&
           region.kecamatan === user.kecamatan &&
           region.kelurahan === user.kelurahan,
       )
-    : regions;
+    : regionList;
+
   const dangerCount = relevantRegions.filter(
     (region) => region.status === "bahaya",
   ).length;
-  const totalDonations = donationHistory.reduce(
+
+  const totalDonations = donationList.reduce(
     (sum, donation) => sum + donation.amount,
     0,
   );
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6 pb-6">
       <PageHeader
         title="User Dashboard"
         description="Personal response cockpit with weather, alerts, quick actions, and social contribution tracking."
       />
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
         <StatCard
           title="Danger Regions Nearby"
           value={`${dangerCount}`}
@@ -66,28 +73,35 @@ export function UserDashboardPage() {
         />
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-[0.85fr_1.15fr]">
-        <div className="space-y-4">
+      <div className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr] items-start">
+        <div className="space-y-6">
           <WeatherWidget />
-          <Card className="space-y-3">
-            <p className="text-sm text-muted-foreground">
+
+          <Card className="space-y-3 p-4">
+            <p className="text-sm font-medium text-muted-foreground">
               Data Synchronization
             </p>
             <Skeleton className="h-5 w-2/3" />
             <Skeleton className="h-4 w-full" />
             <Skeleton className="h-4 w-5/6" />
           </Card>
+
           <QuickActions />
         </div>
-        <NotificationsPanel />
+
+        <div className="self-start">
+          <NotificationsPanel />
+        </div>
       </div>
 
-      <MonitoringMap
-        compact
-        regions={regions}
-        loading={regionsLoading}
-        error={regionsError}
-      />
+      <div className="pt-2">
+        <MonitoringMap
+          compact
+          regions={regionList}
+          loading={regionsLoading}
+          error={regionsError}
+        />
+      </div>
     </div>
   );
 }

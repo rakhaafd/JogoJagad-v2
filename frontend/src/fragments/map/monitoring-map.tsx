@@ -74,7 +74,7 @@ export function MonitoringMap({
   }, [regions]);
 
   return (
-    <Card className="space-y-4">
+    <Card className="relative z-0 space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">Disaster Monitoring Map</h3>
         <span className="inline-flex items-center gap-2 rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground">
@@ -92,7 +92,7 @@ export function MonitoringMap({
         {!loading && error ? (
           <div className="mt-3 text-sm text-danger">{error}</div>
         ) : null}
-        {!loading && !error && regions.length === 0 ? (
+        {!loading && !error && regions.length === 0 && !compact ? (
           <div className="mt-3">
             <EmptyState
               title="No region data"

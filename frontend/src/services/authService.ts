@@ -21,11 +21,23 @@ export const authService = {
   },
 
   async register(payload: RegisterPayload) {
-    const endpoint =
-      payload.role === "admin" ? "/auth/admin/register" : "/auth/register";
-    return apiFetch<AuthResponse>(endpoint, {
+    const body = {
+      name: payload.name,
+      email: payload.email,
+      password: payload.password,
+      provinsi: payload.provinsi,
+      kota: payload.kota,
+      kecamatan: payload.kecamatan,
+      kelurahan: payload.kelurahan,
+    };
+
+    const cleanedBody = Object.fromEntries(
+      Object.entries(body).filter((entry) => entry[1] !== undefined),
+    );
+
+    return apiFetch<AuthResponse>("/auth/register", {
       method: "POST",
-      body: payload,
+      body: cleanedBody,
       auth: false,
     });
   },

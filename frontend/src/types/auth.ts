@@ -27,7 +27,6 @@ export interface RegisterPayload {
   name: string;
   email: string;
   password: string;
-  role: UserRole;
   kelurahan?: string;
   kecamatan?: string;
   kota?: string;

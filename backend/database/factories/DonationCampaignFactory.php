@@ -15,7 +15,7 @@ class DonationCampaignFactory extends Factory
         return [
             'title' => fake()->sentence(4),
             'description' => fake()->paragraphs(2, true),
-            'image_path' => null,
+            'image_path' => fake()->imageUrl(800, 450),
             'target_amount' => fake()->numberBetween(100000, 10000000),
             'current_amount' => 0,
         ];

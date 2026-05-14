@@ -21,15 +21,11 @@ export function LandingPage() {
     error: regionsError,
   } = useApi(disasterService.regions);
 
-  // Pastikan data selalu berupa array (handle null/undefined)
   const news = Array.isArray(newsData) ? newsData : [];
   const regions = Array.isArray(regionsData) ? regionsData : [];
-
-  // Filter berita yang memiliki content valid
   const validNews = news.filter(article => article && article.content && typeof article.content === 'string');
   const highlightNews = validNews.slice(0, 3);
 
-  // Helper function untuk format konten dengan aman
   const formatContent = (content, maxLength = 110) => {
     if (!content || typeof content !== 'string') {
       return 'Content not available';
@@ -40,19 +36,20 @@ export function LandingPage() {
     return `${content.slice(0, maxLength)}...`;
   };
 
-  // Tampilkan loading state untuk kedua API
   if (newsLoading || regionsLoading) {
     return (
       <div className="space-y-8 pb-8">
         <HeroSection />
         <StatsSection />
         
-        <section className="space-y-4">
+        <section className="relative isolate space-y-4"> {/* ← Tambah relative isolate */}
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-semibold">Real-time Monitoring Preview</h2>
             <div className="text-sm font-medium text-primary">Open Fullscreen Map</div>
           </div>
-          <Skeleton className="h-[400px] w-full rounded-lg" />
+          <div className="relative z-0"> {/* ← Tambah wrapper z-0 */}
+            <Skeleton className="h-[400px] w-full rounded-lg" />
+          </div>
         </section>
 
         <section className="grid gap-4 md:grid-cols-2">
@@ -85,7 +82,8 @@ export function LandingPage() {
       <HeroSection />
       <StatsSection />
 
-      <section className="space-y-4">
+      {/* Map Section - Fixed z-index issue */}
+      <section className="relative isolate space-y-4"> {/* ← Tambah relative isolate */}
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-semibold">
             Real-time Monitoring Preview
@@ -94,16 +92,20 @@ export function LandingPage() {
             Open Fullscreen Map
           </Link>
         </div>
-        <MonitoringMap
-          compact
-          regions={regions}
-          loading={regionsLoading}
-          error={regionsError}
-        />
+        
+        {/* Wrapper dengan z-index rendah */}
+        <div className="relative z-0">
+          <MonitoringMap
+            compact
+            regions={regions}
+            loading={regionsLoading}
+            error={regionsError}
+          />
+        </div>
       </section>
 
       <section className="grid gap-4 md:grid-cols-2">
-        <Card className="bg-gradient-to-br from-primary/15 to-card">
+        <Card className="bg-gradient-to-br from-primary/15 to-card relative z-0">
           <div className="inline-flex items-center gap-2 text-sm font-medium text-primary">
             <Sparkles className="h-4 w-4" /> AI Ask & Quiz
           </div>
@@ -120,7 +122,7 @@ export function LandingPage() {
           </Link>
         </Card>
 
-        <Card className="bg-gradient-to-br from-emerald-500/10 to-card">
+        <Card className="bg-gradient-to-br from-emerald-500/10 to-card relative z-0">
           <Badge tone="safe">Donation & Impact</Badge>
           <h3 className="mt-2 text-2xl font-semibold">
             Fund rapid response campaigns transparently.
@@ -134,7 +136,7 @@ export function LandingPage() {
         </Card>
       </section>
 
-      <section className="space-y-4">
+      <section className="space-y-4 relative z-0">
         <h2 className="text-2xl font-semibold">Latest Disaster News</h2>
         <div className="grid gap-4 md:grid-cols-3">
           {highlightNews.length === 0 ? (
@@ -172,7 +174,7 @@ export function LandingPage() {
         </div>
       </section>
 
-      <footer className="rounded-2xl border border-border bg-card p-6 text-sm text-muted-foreground">
+      <footer className="rounded-2xl border border-border bg-card p-6 text-sm text-muted-foreground relative z-0">
         © {new Date().getFullYear()} JogoJagad · Smart disaster management for
         resilient communities.
       </footer>

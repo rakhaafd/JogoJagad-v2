@@ -13,6 +13,7 @@ import type {
   FormFieldConfig,
   LoginPayload,
   RegisterPayload,
+  User,
   UserRole,
 } from "../../types";
 
@@ -36,8 +37,8 @@ export function AuthForm({ mode }: AuthFormProps) {
     kelurahan: "",
   });
 
-  const loginMutation = useMutation<void, LoginPayload>(login);
-  const registerMutation = useMutation<void, RegisterPayload>(register);
+  const loginMutation = useMutation<User, LoginPayload>(login);
+  const registerMutation = useMutation<User, RegisterPayload>(register);
   const mutation = isLogin ? loginMutation : registerMutation;
 
   const fields = useMemo<FormFieldConfig[]>(() => {
@@ -64,7 +65,6 @@ export function AuthForm({ mode }: AuthFormProps) {
     }
 
     const basePayload = {
-      role: formValues.role,
       name: formValues.name,
       email: formValues.email,
       password: formValues.password,
@@ -75,24 +75,11 @@ export function AuthForm({ mode }: AuthFormProps) {
     };
 
     const fieldOverrides: Record<string, Partial<FormFieldConfig>> = {
-      role: {
-        type: "select",
-        label: "Role",
-        options: [
-          { label: "User", value: "user" },
-          { label: "Admin", value: "admin" },
-        ],
-      },
       password: { type: "password", autoComplete: "new-password" },
       email: { type: "email", autoComplete: "email" },
     };
 
-    const generated = buildFormFields(basePayload, fieldOverrides);
-    return formValues.role === "admin"
-      ? generated.filter((field) =>
-          ["role", "name", "email", "password"].includes(field.name),
-        )
-      : generated;
+    return buildFormFields(basePayload, fieldOverrides);
   }, [formValues, isLogin]);
 
   const handleChange = (name: keyof typeof formValues, value: unknown) => {
@@ -102,32 +89,32 @@ export function AuthForm({ mode }: AuthFormProps) {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
+      let authenticatedUser: User;
+
       if (isLogin) {
-        await loginMutation.mutate({
+        authenticatedUser = await loginMutation.mutate({
           role: formValues.role,
           email: formValues.email,
           password: formValues.password,
         });
       } else {
-        await registerMutation.mutate({
-          role: formValues.role,
+        authenticatedUser = await registerMutation.mutate({
           name: formValues.name,
           email: formValues.email,
           password: formValues.password,
-          provinsi:
-            formValues.role === "user" ? formValues.provinsi : undefined,
-          kota: formValues.role === "user" ? formValues.kota : undefined,
-          kecamatan:
-            formValues.role === "user" ? formValues.kecamatan : undefined,
-          kelurahan:
-            formValues.role === "user" ? formValues.kelurahan : undefined,
+          provinsi: formValues.provinsi,
+          kota: formValues.kota,
+          kecamatan: formValues.kecamatan,
+          kelurahan: formValues.kelurahan,
         });
       }
 
       pushToast(
         isLogin ? "Signed in successfully." : "Account created successfully.",
       );
-      navigate("/dashboard");
+      navigate(authenticatedUser.role === "admin" ? "/admin" : "/dashboard", {
+        replace: true,
+      });
     } catch {
       pushToast("Please review the form and try again.", "info");
     }

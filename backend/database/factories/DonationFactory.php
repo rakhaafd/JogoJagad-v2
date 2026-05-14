@@ -24,8 +24,8 @@ class DonationFactory extends Factory
             'currency' => 'IDR',
             'status' => fake()->randomElement($statuses),
             'provider' => fake()->randomElement($providers),
-            'external_id' => null,
-            'checkout_url' => null,
+            'external_id' => fake()->uuid(),
+            'checkout_url' => fake()->optional()->url(),
             'paid_at' => null,
             'metadata' => [],
         ];

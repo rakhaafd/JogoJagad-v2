@@ -12,6 +12,7 @@ import { NewsPage } from "../pages/news-page";
 import { NotFoundPage } from "../pages/not-found-page";
 import { RegisterPage } from "../pages/register-page";
 import { UserDashboardPage } from "../pages/user-dashboard-page";
+import { AuthGuard } from "../middleware/authGuard";
 
 export function AppRoutes() {
   return (
@@ -25,8 +26,22 @@ export function AppRoutes() {
       </Route>
 
       <Route element={<AppShellLayout />}>
-        <Route path="/dashboard" element={<UserDashboardPage />} />
-        <Route path="/admin" element={<AdminDashboardPage />} />
+        <Route
+          path="/dashboard"
+          element={
+            <AuthGuard allow={["user"]}>
+              <UserDashboardPage />
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <AuthGuard allow={["admin"]}>
+              <AdminDashboardPage />
+            </AuthGuard>
+          }
+        />
       </Route>
 
       <Route element={<AuthLayout />}>

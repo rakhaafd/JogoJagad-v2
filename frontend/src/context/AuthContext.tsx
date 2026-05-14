@@ -15,8 +15,8 @@ interface AuthContextValue {
   user: User | null;
   isAuthenticated: boolean;
   loading: boolean;
-  login: (payload: LoginPayload) => Promise<void>;
-  register: (payload: RegisterPayload) => Promise<void>;
+  login: (payload: LoginPayload) => Promise<User>;
+  register: (payload: RegisterPayload) => Promise<User>;
   logout: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 }
@@ -54,12 +54,14 @@ export function AuthProvider({ children }: PropsWithChildren) {
     const result = await authService.login(payload);
     setToken(result.token);
     setUser(result.user);
+    return result.user;
   }, []);
 
   const register = useCallback(async (payload: RegisterPayload) => {
     const result = await authService.register(payload);
     setToken(result.token);
     setUser(result.user);
+    return result.user;
   }, []);
 
   const logout = useCallback(async () => {

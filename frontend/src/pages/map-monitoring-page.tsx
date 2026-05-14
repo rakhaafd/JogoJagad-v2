@@ -56,13 +56,19 @@ export function MapMonitoringPage() {
         }
       />
 
-      <div className="grid gap-4 xl:grid-cols-[1fr_0.35fr]">
-        <MonitoringMap
-          regions={filteredRegions}
-          loading={loading}
-          error={error}
-        />
-        <Card className="space-y-4">
+      {/* Grid container dengan z-index management */}
+      <div className="relative isolate grid gap-4 xl:grid-cols-[1fr_0.35fr]">
+        {/* Map Section - dengan z-index rendah */}
+        <div className="relative z-0 rounded-lg overflow-hidden">
+          <MonitoringMap
+            regions={filteredRegions}
+            loading={loading}
+            error={error}
+          />
+        </div>
+
+        {/* Legend Section - dengan z-index sedang */}
+        <Card className="relative z-10 space-y-4">
           <h3 className="text-lg font-semibold">Region Status Legend</h3>
           <div className="space-y-2">
             <p className="inline-flex items-center gap-2 text-sm">
@@ -76,9 +82,10 @@ export function MapMonitoringPage() {
             </p>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-3 max-h-[500px] overflow-y-auto">
             {loading ? (
               <div className="space-y-2">
+                <Skeleton className="h-16 w-full" />
                 <Skeleton className="h-16 w-full" />
                 <Skeleton className="h-16 w-full" />
               </div>
@@ -93,7 +100,7 @@ export function MapMonitoringPage() {
               filteredRegions.map((region) => (
                 <div
                   key={region.id}
-                  className="rounded-xl border border-border bg-muted/20 p-3"
+                  className="rounded-xl border border-border bg-muted/20 p-3 transition-all hover:bg-muted/40"
                 >
                   <div className="flex items-center justify-between">
                     <p className="font-medium">{region.kelurahan}</p>
@@ -106,7 +113,11 @@ export function MapMonitoringPage() {
                             : "safe"
                       }
                     >
-                      {region.status}
+                      {region.status === "bahaya"
+                        ? "Danger"
+                        : region.status === "waspada"
+                          ? "Warning"
+                          : "Safe"}
                     </Badge>
                   </div>
                   <p className="mt-1 text-xs text-muted-foreground">

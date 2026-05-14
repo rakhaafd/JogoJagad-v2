@@ -13,7 +13,7 @@ class ActionFactory extends Factory
 
     public function definition(): array
     {
-        $statuses = ['pending', 'approved', 'rejected'];
+        $statuses = ['pending', 'verified', 'rejected'];
         $types = ['laporan', 'kontribusi', 'pelaporan lingkungan'];
 
         return [

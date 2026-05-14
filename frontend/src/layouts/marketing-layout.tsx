@@ -12,7 +12,7 @@ export function MarketingLayout() {
 
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur">
+      <header className="sticky top-0 z-50 border-b border-border/70 bg-background/85 backdrop-blur"> {/* ← Ubah z-40 ke z-50 */}
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
           <Link to="/" className="text-lg font-semibold tracking-tight">
             Jogo<span className="text-primary">Jagad</span>
@@ -51,7 +51,7 @@ export function MarketingLayout() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/40 md:hidden"
+            className="fixed inset-0 z-[60] bg-black/40 md:hidden" // ← Ubah z-50 ke z-[60]
             onClick={() => setOpen(false)}
           >
             <motion.div
