@@ -12,7 +12,6 @@ export const appNavigation: NavItem[] = [
   { label: "User Dashboard", path: "/dashboard", icon: "layout-dashboard" },
   { label: "Action", path: "/actions", icon: "list" },
   { label: "Admin Dashboard", path: "/admin", icon: "shield-check" },
-  { label: "Map Monitor", path: "/map", icon: "satellite" },
   { label: "News", path: "/news", icon: "newspaper" },
   { label: "Donation", path: "/donation", icon: "wallet" },
   { label: "AI Quiz", path: "/ai-quiz", icon: "bot" },

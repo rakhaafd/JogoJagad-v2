@@ -58,72 +58,143 @@ export function QuizGrid() {
 
   return (
     <div className="space-y-4">
-      <Card className="space-y-3">
-        <div className="flex flex-wrap items-center gap-2">
-          <Input
-            placeholder="Quiz topic (ex: Banjir Bandang)"
-            value={topic}
-            onChange={(event) => setTopic(event.target.value)}
-          />
-          <Button
-            onClick={() => void handleGenerate()}
-            disabled={generateMutation.loading}
-          >
-            {generateMutation.loading ? "Generating..." : "Generate Quiz"}
-          </Button>
+      <Card className="bg-gradient-to-br from-primary/5 to-transparent">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1">
+            <p className="text-xs font-semibold uppercase tracking-wide text-primary">
+              Generate Challenge
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Choose a topic to generate adaptive quiz cards
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-medium text-muted-foreground">
+                Topic
+              </label>
+              <Input
+                placeholder="ex: Banjir Bandang, Storm Safety"
+                value={topic}
+                onChange={(event) => setTopic(event.target.value)}
+                className="bg-background"
+              />
+            </div>
+
+            <Button
+              onClick={() => void handleGenerate()}
+              disabled={generateMutation.loading || !topic.trim()}
+              className="w-full rounded-xl"
+            >
+              {generateMutation.loading ? "Generating..." : "Generate Quiz"}
+            </Button>
+          </div>
         </div>
       </Card>
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {quizzes.map((quiz, index) => (
-          <Card key={`quiz-${index}`} className="space-y-4">
-            <div className="flex items-center justify-between">
-              <Badge>AI Quiz</Badge>
-              <span className="text-xs text-muted-foreground">
-                {quiz.options.length} options
-              </span>
-            </div>
-            <h3 className="font-semibold">{quiz.question}</h3>
-            <div className="space-y-2">
-              {quiz.options.map((option) => (
-                <button
-                  key={`${index}-${option}`}
-                  type="button"
-                  className={`w-full rounded-xl border px-3 py-2 text-left text-sm transition ${
-                    answers[index] === option
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "border-border"
-                  }`}
-                  onClick={() =>
-                    setAnswers((prev) => ({ ...prev, [index]: option }))
-                  }
+      {quizzes.length > 0 && (
+        <>
+          <div className="flex flex-col gap-4">
+            {quizzes.map((quiz, index) => (
+              <Card
+                key={`quiz-${index}`}
+                className="w-full space-y-4 border-l-4 border-l-primary/50 transition hover:shadow-md"
+              >
+                <div className="flex items-center justify-between">
+                  <Badge variant="outline" className="bg-primary/5">
+                    Question {index + 1}
+                  </Badge>
+                  <span className="text-xs font-medium text-muted-foreground">
+                    {quiz.options.length} options
+                  </span>
+                </div>
+                <div>
+                  <h3 className="font-semibold leading-relaxed text-foreground">
+                    {quiz.question}
+                  </h3>
+                </div>
+                <div className="space-y-2">
+                  {quiz.options.map((option, optionIndex) => {
+                    const isSelected = answers[index] === option;
+                    return (
+                      <button
+                        key={`${index}-${optionIndex}`}
+                        type="button"
+                        className={`group w-full rounded-lg border-2 px-4 py-3 text-left text-sm font-medium transition-all duration-200 ${
+                          isSelected
+                            ? "border-primary bg-primary/10 text-primary shadow-sm"
+                            : "border-border/50 text-foreground hover:border-primary/50 hover:bg-muted/30"
+                        }`}
+                        onClick={() =>
+                          setAnswers((prev) => ({ ...prev, [index]: option }))
+                        }
+                      >
+                        <span className="flex items-center gap-3">
+                          <span
+                            className={`flex h-5 w-5 items-center justify-center rounded-md border transition ${
+                              isSelected
+                                ? "border-primary bg-primary text-white"
+                                : "border-border/50 group-hover:border-primary/50"
+                            }`}
+                          >
+                            {isSelected && "✓"}
+                          </span>
+                          {option}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <Button
+                  variant={answers[index] ? "default" : "outline"}
+                  className="w-full rounded-lg"
+                  onClick={() => void handleSubmit(index)}
+                  disabled={!answers[index] || submitMutation.loading}
                 >
-                  {option}
-                </button>
-              ))}
-            </div>
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => void handleSubmit(index)}
-              disabled={!answers[index] || submitMutation.loading}
-            >
-              Submit Answer
-            </Button>
-          </Card>
-        ))}
-      </div>
-      <Card className="flex items-center justify-between">
-        <div>
-          <p className="text-sm text-muted-foreground">Gamification Progress</p>
-          <h3 className="text-xl font-semibold">Current Rank: Guardian Tier</h3>
-        </div>
-        <Trophy className="h-8 w-8 text-warning" />
-      </Card>
-      <Card className="space-y-2">
-        <p className="text-sm text-muted-foreground">Quiz Completion</p>
-        <Progress value={completion} />
-      </Card>
+                  {submitMutation.loading ? "Submitting..." : "Submit Answer"}
+                </Button>
+              </Card>
+            ))}
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card className="bg-gradient-to-br from-warning/5 to-transparent">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Achievement
+                  </p>
+                  <h3 className="mt-2 text-lg font-bold text-foreground">
+                    Guardian Tier
+                  </h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Disaster preparedness expert
+                  </p>
+                </div>
+                <Trophy className="h-10 w-10 text-warning" />
+              </div>
+            </Card>
+
+            <Card className="space-y-3">
+              <div>
+                <div className="flex items-center justify-between">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Progress
+                  </p>
+                  <span className="text-lg font-bold text-primary">
+                    {completion}%
+                  </span>
+                </div>
+              </div>
+              <Progress value={completion} className="h-2" />
+              <p className="text-xs text-muted-foreground">
+                {Object.keys(answers).length} of {quizzes.length} answered
+              </p>
+            </Card>
+          </div>
+        </>
+      )}
     </div>
   );
 }

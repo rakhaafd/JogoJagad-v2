@@ -1,45 +1,75 @@
-import { Filter } from "lucide-react";
+import { Filter, Plus } from "lucide-react";
 import { useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import { PageHeader } from "../components/shared/page-header";
 import { Badge } from "../components/ui/badge";
 import { Card } from "../components/ui/card";
 import { Select } from "../components/ui/select";
+import { Button } from "../components/ui/button";
 import { MonitoringMap } from "../fragments/map/monitoring-map";
 import { Skeleton } from "../components/ui/skeleton";
 import { EmptyState } from "../components/shared/empty-state";
 import { useApi } from "../composables/useApi";
 import { disasterService } from "../services/disasterService";
+import { actionService } from "../services/actionService";
+import type { ActionReport } from "../types";
+
+function getStatusColor(status: string) {
+  switch (status) {
+    case "verified":
+      return "safe";
+    case "pending":
+      return "warning";
+    default:
+      return "default";
+  }
+}
 
 export function MapMonitoringPage() {
-  const [filter, setFilter] = useState("all");
+  const [filterDisaster, setFilterDisaster] = useState("all");
+
+  // Disaster data
   const {
     data: regions = [],
-    loading,
-    error,
+    loading: regionsLoading,
+    error: regionsError,
   } = useApi(disasterService.regions);
+
+  // Action history data
+  const {
+    data: actionsData,
+    loading: actionsLoading,
+    error: actionsError,
+  } = useApi(actionService.listHistory);
+
+  const actions = (actionsData || []) as ActionReport[];
 
   const disasterTypes = useMemo(() => {
     const values = new Set(
-      regions.map((region) => region.disaster_type).filter(Boolean),
+      (regions ?? []).map((region) => region.disaster_type).filter(Boolean),
     );
     return Array.from(values).map((value) => String(value));
   }, [regions]);
 
   const filteredRegions = useMemo(() => {
-    if (filter === "all") return regions;
-    return regions.filter((region) => region.disaster_type === filter);
-  }, [regions, filter]);
+    const regionsList = regions ?? [];
+    if (filterDisaster === "all") return regionsList;
+    return regionsList.filter(
+      (region) => region.disaster_type === filterDisaster,
+    );
+  }, [regions, filterDisaster]);
 
   return (
     <div className="space-y-4">
       <PageHeader
-        title="Map Monitoring"
-        description="Fullscreen geo-visualization for regional disaster severity and disaster type classification."
+        title="Action"
+        description="Real-time disaster monitoring with action history tracking."
         action={
           <div className="flex gap-2">
             <Select
-              value={filter}
-              onChange={(event) => setFilter(event.target.value)}
+              value={filterDisaster}
+              onChange={(event) => setFilterDisaster(event.target.value)}
             >
               <option value="all">All Disaster Types</option>
               {disasterTypes.map((type) => (
@@ -48,7 +78,7 @@ export function MapMonitoringPage() {
                 </option>
               ))}
             </Select>
-            <button className="inline-flex h-11 items-center gap-2 rounded-xl border border-border px-4 text-sm">
+            <button className="inline-flex h-11 items-center gap-2 rounded-xl border border-border px-4 text-sm transition hover:bg-muted">
               <Filter className="h-4 w-4" />
               Filters
             </button>
@@ -56,79 +86,130 @@ export function MapMonitoringPage() {
         }
       />
 
-      {/* Grid container dengan z-index management */}
-      <div className="relative isolate grid gap-4 xl:grid-cols-[1fr_0.35fr]">
-        {/* Map Section - dengan z-index rendah */}
-        <div className="relative z-0 rounded-lg overflow-hidden">
+      {/* Map Widget */}
+      <Card className="relative overflow-hidden">
+        <div className="h-64 rounded-lg overflow-hidden">
           <MonitoringMap
             regions={filteredRegions}
-            loading={loading}
-            error={error}
+            loading={regionsLoading}
+            error={regionsError}
           />
         </div>
+      </Card>
 
-        {/* Legend Section - dengan z-index sedang */}
-        <Card className="relative z-10 space-y-4">
-          <h3 className="text-lg font-semibold">Region Status Legend</h3>
-          <div className="space-y-2">
-            <p className="inline-flex items-center gap-2 text-sm">
-              <span className="h-2.5 w-2.5 rounded-full bg-safe" /> Safe
-            </p>
-            <p className="inline-flex items-center gap-2 text-sm">
-              <span className="h-2.5 w-2.5 rounded-full bg-warning" /> Warning
-            </p>
-            <p className="inline-flex items-center gap-2 text-sm">
-              <span className="h-2.5 w-2.5 rounded-full bg-danger" /> Danger
+      {/* Legend */}
+      <Card className="space-y-3">
+        <h3 className="text-sm font-semibold text-foreground">
+          Region Status Legend
+        </h3>
+        <div className="grid gap-3 grid-cols-3">
+          <div className="inline-flex items-center gap-2">
+            <span className="h-2.5 w-2.5 rounded-full bg-safe" />
+            <span className="text-xs text-muted-foreground">Safe</span>
+          </div>
+          <div className="inline-flex items-center gap-2">
+            <span className="h-2.5 w-2.5 rounded-full bg-warning" />
+            <span className="text-xs text-muted-foreground">Warning</span>
+          </div>
+          <div className="inline-flex items-center gap-2">
+            <span className="h-2.5 w-2.5 rounded-full bg-danger" />
+            <span className="text-xs text-muted-foreground">Danger</span>
+          </div>
+        </div>
+      </Card>
+
+      {/* Action History Section */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-semibold text-foreground">
+              Action History
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Your submitted reports
             </p>
           </div>
+          <Link to="/hazard-report">
+            <Button className="gap-2">
+              <Plus className="h-4 w-4" />
+              New Report
+            </Button>
+          </Link>
+        </div>
 
-          <div className="space-y-3 max-h-[500px] overflow-y-auto">
-            {loading ? (
-              <div className="space-y-2">
-                <Skeleton className="h-16 w-full" />
-                <Skeleton className="h-16 w-full" />
-                <Skeleton className="h-16 w-full" />
-              </div>
-            ) : error ? (
-              <div className="text-sm text-danger">{error}</div>
-            ) : filteredRegions.length === 0 ? (
-              <EmptyState
-                title="No region alerts"
-                message="There are no region updates matching this filter."
-              />
-            ) : (
-              filteredRegions.map((region) => (
-                <div
-                  key={region.id}
-                  className="rounded-xl border border-border bg-muted/20 p-3 transition-all hover:bg-muted/40"
-                >
-                  <div className="flex items-center justify-between">
-                    <p className="font-medium">{region.kelurahan}</p>
-                    <Badge
-                      tone={
-                        region.status === "bahaya"
-                          ? "danger"
-                          : region.status === "waspada"
-                            ? "warning"
-                            : "safe"
-                      }
-                    >
-                      {region.status === "bahaya"
-                        ? "Danger"
-                        : region.status === "waspada"
-                          ? "Warning"
-                          : "Safe"}
-                    </Badge>
-                  </div>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {region.disaster_type ?? "Unknown"} ·{" "}
-                    {new Date(region.updated_at).toLocaleString("id-ID")}
-                  </p>
-                </div>
-              ))
-            )}
+        {actionsLoading ? (
+          <div className="grid gap-4 md:grid-cols-2">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <Card key={`loading-${index}`} className="space-y-2">
+                <Skeleton className="h-6 w-32" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-2/3" />
+              </Card>
+            ))}
           </div>
-        </Card>
+        ) : actionsError ? (
+          <EmptyState title="Failed to load actions" message={actionsError} />
+        ) : actions.length === 0 ? (
+          <EmptyState
+            title="No action reports yet"
+            message="Mulai dengan membuat laporan aksi baru untuk berkontribusi."
+          />
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2">
+            {actions.map((action: ActionReport, index: number) => (
+              <motion.div
+                key={action.id}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+              >
+                <Link to={`/actions/${action.id}`} className="block">
+                  <Card className="cursor-pointer transition-all hover:shadow-md hover:border-primary/50 space-y-3">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-foreground">
+                          {action.title}
+                        </h4>
+                        <p className="text-xs text-muted-foreground">
+                          {action.action_type}
+                        </p>
+                      </div>
+                      <Badge tone={getStatusColor(action.status)}>
+                        {action.status}
+                      </Badge>
+                    </div>
+
+                    <p className="text-sm text-muted-foreground line-clamp-2">
+                      {action.description}
+                    </p>
+
+                    <div className="flex flex-col gap-2 text-xs text-muted-foreground">
+                      <p>
+                        Submitted:{" "}
+                        {new Date(action.created_at).toLocaleDateString(
+                          "id-ID",
+                        )}
+                      </p>
+                      {action.verification && (
+                        <div className="rounded-lg border border-border/50 bg-muted/20 p-2">
+                          <p className="font-medium text-safe">
+                            ✓ Verified · {action.verification.points_awarded}{" "}
+                            pts
+                          </p>
+                          {action.verification.notes && (
+                            <p className="text-xs">
+                              {action.verification.notes}
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </Card>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

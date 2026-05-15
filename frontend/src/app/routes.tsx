@@ -5,7 +5,6 @@ import { MarketingLayout } from "../layouts/marketing-layout";
 import { AdminDashboardPage } from "../pages/admin-dashboard-page";
 import { AIQuizPage } from "../pages/ai-quiz-page";
 import { ActionDetailPage } from "../pages/action-detail-page";
-import { ActionHistoryPage } from "../pages/action-history-page";
 import { DonationPage } from "../pages/donation-page";
 import { DonationDetailPage } from "../pages/donation-detail-page";
 import { DonationHistoryPage } from "../pages/donation-history-page";
@@ -39,7 +38,7 @@ export function AppRoutes() {
           path="/actions"
           element={
             <AuthGuard allow={["user"]}>
-              <ActionHistoryPage />
+              <MapMonitoringPage />
             </AuthGuard>
           }
         />
@@ -51,7 +50,14 @@ export function AppRoutes() {
             </AuthGuard>
           }
         />
-        <Route path="/map" element={<MapMonitoringPage />} />
+        <Route
+          path="/map"
+          element={
+            <AuthGuard allow={["user"]}>
+              <MapMonitoringPage />
+            </AuthGuard>
+          }
+        />
         <Route path="/news" element={<NewsPage />} />
         <Route path="/news/:id" element={<NewsDetailPage />} />
         <Route path="/donation/:id" element={<DonationDetailPage />} />
