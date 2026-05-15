@@ -9,13 +9,20 @@ import { Skeleton } from "../components/ui/skeleton";
 import { Modal } from "../components/ui/modal";
 import { Select } from "../components/ui/select";
 import { Textarea } from "../components/ui/textarea";
+import { MonitoringMap } from "../fragments/map/monitoring-map";
 import { useApi } from "../composables/useApi";
 import { useToast } from "../components/ui/toast";
 import { actionService } from "../services/actionService";
+import { disasterService } from "../services/disasterService";
 
 export function ActionReportsPage() {
   const { pushToast } = useToast();
   const { data, loading, error, refetch } = useApi(actionService.list);
+  const {
+    data: regions = [],
+    loading: regionsLoading,
+    error: regionsError,
+  } = useApi(disasterService.regions);
 
   const items: ActionReport[] =
     (data as ActionListResponse | undefined)?.actions ?? [];
@@ -58,6 +65,15 @@ export function ActionReportsPage() {
     }
   }, [verifyingActionId, verifyForm, pushToast, refetch, closeVerifyModal]);
 
+  const mapWidget = (
+    <MonitoringMap
+      compact
+      regions={regions ?? []}
+      loading={regionsLoading}
+      error={regionsError}
+    />
+  );
+
   if (loading) {
     return (
       <div className="space-y-4">
@@ -65,6 +81,7 @@ export function ActionReportsPage() {
           title="Action Reports"
           description="List of reported actions."
         />
+        {mapWidget}
         <Card className="space-y-4">
           <Skeleton className="h-8 w-40" />
           <Skeleton className="h-11 w-full" />
@@ -82,6 +99,7 @@ export function ActionReportsPage() {
           title="Action Reports"
           description="List of reported actions."
         />
+        {mapWidget}
         <EmptyState title="Failed to load actions" message={error} />
       </div>
     );
@@ -100,6 +118,8 @@ export function ActionReportsPage() {
         title="Action Reports"
         description="Review and verify reported actions."
       />
+
+      {mapWidget}
 
       <div className="grid gap-4 md:grid-cols-2">
         <div>
