@@ -21,5 +21,6 @@ export const adminAppNavigation: NavItem[] = [
   { label: "User Management", path: "/admin/users", icon: "users" },
   { label: "Action Reports", path: "/admin/actions", icon: "file-text" },
   { label: "News Management", path: "/admin/news", icon: "newspaper" },
+  { label: "Donation Management", path: "/admin/donations", icon: "wallet" },
   { label: "Region Status", path: "/admin/regions", icon: "alert-circle" },
 ];

@@ -22,6 +22,10 @@ import { ActionReportsPage } from "../pages/action-reports-page";
 import { AdminNewsPage } from "../pages/admin-news-page";
 import { AdminNewsCreatePage } from "../pages/admin-news-create-page";
 import { AdminNewsEditPage } from "../pages/admin-news-edit-page";
+import { AdminDonationPage } from "../pages/admin-donation-page";
+import { AdminDonationDetailPage } from "../pages/admin-donation-detail-page";
+import { AdminDonationCreatePage } from "../pages/admin-donation-create-page";
+import { AdminDonationEditPage } from "../pages/admin-donation-edit-page";
 import { AdminRegionStatusPage } from "../pages/admin-region-status-page";
 import { AdminRegionStatusDetailPage } from "../pages/admin-region-status-detail-page";
 import { AdminRegionStatusCreatePage } from "../pages/admin-region-status-create-page";
@@ -143,6 +147,38 @@ export function AppRoutes() {
           element={
             <AuthGuard allow={["admin"]}>
               <AdminNewsEditPage />
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/admin/donations"
+          element={
+            <AuthGuard allow={["admin"]}>
+              <AdminDonationPage />
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/admin/donations/create"
+          element={
+            <AuthGuard allow={["admin"]}>
+              <AdminDonationCreatePage />
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/admin/donations/:id/edit"
+          element={
+            <AuthGuard allow={["admin"]}>
+              <AdminDonationEditPage />
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/admin/donations/:id"
+          element={
+            <AuthGuard allow={["admin"]}>
+              <AdminDonationDetailPage />
             </AuthGuard>
           }
         />
