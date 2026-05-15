@@ -6,9 +6,8 @@ import { Textarea } from "../components/ui/textarea";
 import { Card } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { useMutation } from "../composables/useMutation";
-import { actionService } from "../services/actionService";
+import { disasterService } from "../services/disasterService";
 import { useToast } from "../components/ui/toast";
-import type { ActionReport } from "../types";
 
 interface HazardReportFormValues {
   title: string;
@@ -27,11 +26,8 @@ const initialFormValues: HazardReportFormValues = {
 export function HazardReportPage() {
   const [formValues, setFormValues] =
     useState<HazardReportFormValues>(initialFormValues);
-  const [submittedAction, setSubmittedAction] = useState<ActionReport | null>(
-    null,
-  );
   const { pushToast } = useToast();
-  const mutation = useMutation(actionService.submit);
+  const mutation = useMutation(disasterService.submitAction);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -41,14 +37,13 @@ export function HazardReportPage() {
     }
 
     try {
-      const action = await mutation.mutate({
+      await mutation.mutate({
         title: formValues.title,
         action_type: formValues.action_type,
         description: formValues.description,
         photo: formValues.photo,
       });
 
-      setSubmittedAction(action);
       setFormValues(initialFormValues);
       pushToast("Hazard report berhasil dikirim.");
     } catch {

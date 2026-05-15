@@ -121,7 +121,7 @@ export function LandingPage() {
           </button>
         </div>
         {/* Wrapper dengan z-index rendah */}
-        <div className="relative z-0">
+        <div className="relative z-0 h-[400px]">
           <MonitoringMap
             compact
             regions={regions}
@@ -142,14 +142,13 @@ export function LandingPage() {
           <p className="mt-2 text-sm text-muted-foreground">
             Engage with adaptive AI guidance and gamified quiz modules.
           </p>
-          <button
+          <Button
+            variant="outline"
+            className="mt-4 inline-flex gap-2"
             onClick={() => handleProtectedNavigation("/ai-quiz")}
-            className="mt-4 inline-block"
           >
-            <Button variant="outline" className="gap-2">
-              Start Learning <ArrowRight className="h-4 w-4" />
-            </Button>
-          </button>
+            Start Learning <ArrowRight className="h-4 w-4" />
+          </Button>
         </Card>
 
         <Card className="bg-gradient-to-br from-emerald-500/10 to-card relative z-0">
@@ -160,12 +159,12 @@ export function LandingPage() {
           <p className="mt-2 text-sm text-muted-foreground">
             Track campaign progress and direct support to active disaster zones.
           </p>
-          <button
+          <Button
+            className="mt-4"
             onClick={() => handleProtectedNavigation("/donation")}
-            className="mt-4 inline-block"
           >
-            <Button>Explore Campaigns</Button>
-          </button>
+            Explore Campaigns
+          </Button>
         </Card>
       </section>
 
@@ -181,12 +180,12 @@ export function LandingPage() {
                 <p className="mt-1 max-w-xs text-sm text-muted-foreground">
                   To view the news, please sign in first
                 </p>
-                <button
-                  onClick={() => handleProtectedNavigation("/news")}
+                <Button
                   className="mt-4"
+                  onClick={() => handleProtectedNavigation("/news")}
                 >
-                  <Button>View News</Button>
-                </button>
+                  View News
+                </Button>
               </div>
             </div>
           ) : highlightNews.length === 0 ? (

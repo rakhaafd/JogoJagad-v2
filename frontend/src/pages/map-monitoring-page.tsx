@@ -12,7 +12,6 @@ import { Skeleton } from "../components/ui/skeleton";
 import { EmptyState } from "../components/shared/empty-state";
 import { useApi } from "../composables/useApi";
 import { disasterService } from "../services/disasterService";
-import { actionService } from "../services/actionService";
 import type { ActionReport } from "../types";
 
 function getStatusColor(status: string) {
@@ -41,7 +40,7 @@ export function MapMonitoringPage() {
     data: actionsData,
     loading: actionsLoading,
     error: actionsError,
-  } = useApi(actionService.listHistory);
+  } = useApi(disasterService.userActions);
 
   const actions = (actionsData || []) as ActionReport[];
 
