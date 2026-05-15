@@ -6,6 +6,8 @@ import {
   List,
   Map,
   Newspaper,
+  Users,
+  FileText,
   Satellite,
   ShieldCheck,
   Siren,
@@ -26,4 +28,6 @@ export const navIconMap: Record<string, LucideIcon> = {
   bot: Bot,
   siren: Siren,
   list: List,
+  users: Users,
+  "file-text": FileText,
 };

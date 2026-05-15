@@ -27,6 +27,7 @@ function AppNav({ onNavigate }: { onNavigate?: () => void }) {
             key={item.path}
             to={item.path}
             onClick={onNavigate}
+            end={item.path === "/admin"}
             className={({ isActive }) =>
               cn(
                 "flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-muted-foreground transition hover:bg-muted hover:text-foreground",
