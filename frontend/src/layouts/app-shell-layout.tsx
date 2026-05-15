@@ -5,25 +5,18 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { navIconMap } from "../components/shared/nav-icons";
 import { ThemeToggle } from "../components/shared/theme-toggle";
 import { useAuth } from "../hooks/useAuth";
-import { appNavigation } from "../constants/navigation";
+import { adminAppNavigation, userAppNavigation } from "../constants/navigation";
 import { Button } from "../components/ui/button";
 import { cn } from "../utils/cn";
 
 function AppNav({ onNavigate }: { onNavigate?: () => void }) {
   const { user } = useAuth();
 
-  const items = appNavigation.filter((item) => {
-    if (!user) return false;
-
-    if (item.path === "/dashboard") return user.role === "user";
-    if (item.path === "/hazard-report") return user.role === "user";
-    if (item.path === "/actions") return user.role === "user";
-
-    // only show admin link to admin users
-    if (item.path === "/admin") return user.role === "admin";
-
-    return true;
-  });
+  const items = !user
+    ? []
+    : user.role === "admin"
+      ? adminAppNavigation
+      : userAppNavigation;
 
   return (
     <nav className="space-y-1">

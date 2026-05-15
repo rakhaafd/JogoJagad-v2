@@ -8,9 +8,15 @@ export const publicNavigation: NavItem[] = [
   { label: "AI Quiz", path: "/ai-quiz", icon: "sparkles" },
 ];
 
-export const appNavigation: NavItem[] = [
+export const userAppNavigation: NavItem[] = [
   { label: "User Dashboard", path: "/dashboard", icon: "layout-dashboard" },
   { label: "Action", path: "/actions", icon: "list" },
+  { label: "News", path: "/news", icon: "newspaper" },
+  { label: "Donation", path: "/donation", icon: "wallet" },
+  { label: "AI Quiz", path: "/ai-quiz", icon: "bot" },
+];
+
+export const adminAppNavigation: NavItem[] = [
   { label: "Admin Dashboard", path: "/admin", icon: "shield-check" },
   { label: "News", path: "/news", icon: "newspaper" },
   { label: "Donation", path: "/donation", icon: "wallet" },

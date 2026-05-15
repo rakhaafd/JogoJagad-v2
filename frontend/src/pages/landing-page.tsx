@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { HeroSection } from "../fragments/landing/hero-section";
 import { StatsSection } from "../fragments/landing/stats-section";
@@ -10,10 +10,13 @@ import { Badge } from "../components/ui/badge";
 import { EmptyState } from "../components/shared/empty-state";
 import { Skeleton } from "../components/ui/skeleton";
 import { useApi } from "../composables/useApi";
+import { useAuth } from "../hooks/useAuth";
 import { newsService } from "../services/newsService";
 import { disasterService } from "../services/disasterService";
 
 export function LandingPage() {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const { data: newsData, loading: newsLoading } = useApi(newsService.list);
   const {
     data: regionsData,
@@ -23,12 +26,23 @@ export function LandingPage() {
 
   const news = Array.isArray(newsData) ? newsData : [];
   const regions = Array.isArray(regionsData) ? regionsData : [];
-  const validNews = news.filter(article => article && article.content && typeof article.content === 'string');
+  const validNews = news.filter(
+    (article) =>
+      article && article.content && typeof article.content === "string",
+  );
   const highlightNews = validNews.slice(0, 3);
 
-  const formatContent = (content, maxLength = 110) => {
-    if (!content || typeof content !== 'string') {
-      return 'Content not available';
+  const handleProtectedNavigation = (path: string) => {
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
+    }
+    navigate(path);
+  };
+
+  const formatContent = (content: string, maxLength = 110) => {
+    if (!content || typeof content !== "string") {
+      return "Content not available";
     }
     if (content.length <= maxLength) {
       return content;
@@ -41,13 +55,21 @@ export function LandingPage() {
       <div className="space-y-8 pb-8">
         <HeroSection />
         <StatsSection />
-        
-        <section className="relative isolate space-y-4"> {/* ← Tambah relative isolate */}
+
+        <section className="relative isolate space-y-4">
+          {" "}
+          {/* ← Tambah relative isolate */}
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-semibold">Real-time Monitoring Preview</h2>
-            <div className="text-sm font-medium text-primary">Open Fullscreen Map</div>
+            <h2 className="text-2xl font-semibold">
+              Real-time Monitoring Preview
+            </h2>
+            <div className="text-sm font-medium text-primary">
+              Open Fullscreen Map
+            </div>
           </div>
-          <div className="relative z-0"> {/* ← Tambah wrapper z-0 */}
+          <div className="relative z-0">
+            {" "}
+            {/* ← Tambah wrapper z-0 */}
             <Skeleton className="h-[400px] w-full rounded-lg" />
           </div>
         </section>
@@ -71,7 +93,8 @@ export function LandingPage() {
         </section>
 
         <footer className="rounded-2xl border border-border bg-card p-6 text-sm text-muted-foreground">
-          © {new Date().getFullYear()} JogoJagad · Smart disaster management for resilient communities.
+          © {new Date().getFullYear()} JogoJagad · Smart disaster management for
+          resilient communities.
         </footer>
       </div>
     );
@@ -83,16 +106,20 @@ export function LandingPage() {
       <StatsSection />
 
       {/* Map Section - Fixed z-index issue */}
-      <section className="relative isolate space-y-4"> {/* ← Tambah relative isolate */}
+      <section className="relative isolate space-y-4">
+        {" "}
+        {/* ← Tambah relative isolate */}
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-semibold">
             Real-time Monitoring Preview
           </h2>
-          <Link to="/map" className="text-sm font-medium text-primary">
+          <button
+            onClick={() => handleProtectedNavigation("/map")}
+            className="text-sm font-medium text-primary transition hover:text-primary/80"
+          >
             Open Fullscreen Map
-          </Link>
+          </button>
         </div>
-        
         {/* Wrapper dengan z-index rendah */}
         <div className="relative z-0">
           <MonitoringMap
@@ -115,11 +142,14 @@ export function LandingPage() {
           <p className="mt-2 text-sm text-muted-foreground">
             Engage with adaptive AI guidance and gamified quiz modules.
           </p>
-          <Link to="/ai-quiz" className="mt-4 inline-block">
+          <button
+            onClick={() => handleProtectedNavigation("/ai-quiz")}
+            className="mt-4 inline-block"
+          >
             <Button variant="outline" className="gap-2">
               Start Learning <ArrowRight className="h-4 w-4" />
             </Button>
-          </Link>
+          </button>
         </Card>
 
         <Card className="bg-gradient-to-br from-emerald-500/10 to-card relative z-0">
@@ -130,16 +160,36 @@ export function LandingPage() {
           <p className="mt-2 text-sm text-muted-foreground">
             Track campaign progress and direct support to active disaster zones.
           </p>
-          <Link to="/donation" className="mt-4 inline-block">
+          <button
+            onClick={() => handleProtectedNavigation("/donation")}
+            className="mt-4 inline-block"
+          >
             <Button>Explore Campaigns</Button>
-          </Link>
+          </button>
         </Card>
       </section>
 
       <section className="space-y-4 relative z-0">
         <h2 className="text-2xl font-semibold">Latest Disaster News</h2>
         <div className="grid gap-4 md:grid-cols-3">
-          {highlightNews.length === 0 ? (
+          {!isAuthenticated ? (
+            <div className="md:col-span-3">
+              <div className="flex min-h-56 flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card text-center">
+                <h3 className="text-lg font-semibold">
+                  Stay Updated with News
+                </h3>
+                <p className="mt-1 max-w-xs text-sm text-muted-foreground">
+                  To view the news, please sign in first
+                </p>
+                <button
+                  onClick={() => handleProtectedNavigation("/news")}
+                  className="mt-4"
+                >
+                  <Button>View News</Button>
+                </button>
+              </div>
+            </div>
+          ) : highlightNews.length === 0 ? (
             <div className="md:col-span-3">
               <EmptyState
                 title="No news yet"
@@ -155,16 +205,16 @@ export function LandingPage() {
                 transition={{ delay: index * 0.08 }}
               >
                 <Card>
-                  <Badge>{article.category || 'General'}</Badge>
+                  <Badge>{article.category || "General"}</Badge>
                   <h3 className="mt-3 font-semibold">
-                    {article.title || 'Untitled'}
+                    {article.title || "Untitled"}
                   </h3>
                   <p className="mt-2 text-sm text-muted-foreground">
                     {formatContent(article.content)}
                   </p>
-                  {article.published_at && (
+                  {article.created_at && (
                     <p className="mt-2 text-xs text-muted-foreground">
-                      {new Date(article.published_at).toLocaleDateString()}
+                      {new Date(article.created_at).toLocaleDateString()}
                     </p>
                   )}
                 </Card>
