@@ -18,6 +18,7 @@ export const userAppNavigation: NavItem[] = [
 
 export const adminAppNavigation: NavItem[] = [
   { label: "Admin Dashboard", path: "/admin", icon: "shield-check" },
+  { label: "User Management", path: "/admin/users", icon: "list" },
   { label: "News", path: "/news", icon: "newspaper" },
   { label: "Donation", path: "/donation", icon: "wallet" },
   { label: "AI Quiz", path: "/ai-quiz", icon: "bot" },
