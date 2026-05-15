@@ -1,5 +1,7 @@
 import { apiFetch } from "./api";
 import type {
+  DonationCampaignDetail,
+  DonationCampaignDetailResponse,
   DonationCampaignsResponse,
   DonationCampaignUpsertPayload,
   DonationCreatePayload,
@@ -25,9 +27,7 @@ export const donationService = {
 
   async campaignDetail(id: number, admin = false) {
     const endpoint = admin ? `/admin/donations/${id}` : `/donations/${id}`;
-    const data = await apiFetch<{
-      campaign: DonationCampaignsResponse["campaigns"][number];
-    }>(endpoint);
+    const data = await apiFetch<DonationCampaignDetailResponse>(endpoint);
     return data.campaign;
   },
 

@@ -10,7 +10,7 @@ export const publicNavigation: NavItem[] = [
 
 export const appNavigation: NavItem[] = [
   { label: "User Dashboard", path: "/dashboard", icon: "layout-dashboard" },
-  { label: "Action History", path: "/actions", icon: "list" },
+  { label: "Action", path: "/actions", icon: "list" },
   { label: "Admin Dashboard", path: "/admin", icon: "shield-check" },
   { label: "Map Monitor", path: "/map", icon: "satellite" },
   { label: "News", path: "/news", icon: "newspaper" },

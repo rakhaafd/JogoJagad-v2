@@ -1,6 +1,16 @@
-import type { User } from "./auth";
+export type DonationStatus =
+  | "pending"
+  | "paid"
+  | "expired"
+  | "PENDING"
+  | "PAID"
+  | "EXPIRED";
 
-export type DonationStatus = "PENDING" | "PAID" | "EXPIRED";
+export interface DonationUser {
+  id: number;
+  name: string;
+  total_points?: number;
+}
 
 export interface DonationCampaign {
   id: number;
@@ -19,17 +29,29 @@ export interface Donation {
   user_id: number;
   donation_campaign_id: number;
   amount: number;
+  currency?: string;
   status: DonationStatus;
+  provider?: string;
   checkout_url: string | null;
   external_id: string;
   paid_at: string | null;
   metadata?: Record<string, unknown> | null;
+  created_at?: string;
+  updated_at?: string;
   campaign?: DonationCampaign;
-  user?: Pick<User, "id" | "name" | "email">;
+  user?: DonationUser;
+}
+
+export interface DonationCampaignDetail extends DonationCampaign {
+  donations: Donation[];
 }
 
 export interface DonationCampaignsResponse {
   campaigns: DonationCampaign[];
+}
+
+export interface DonationCampaignDetailResponse {
+  campaign: DonationCampaignDetail;
 }
 
 export interface DonationHistoryResponse {

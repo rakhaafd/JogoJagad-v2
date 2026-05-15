@@ -7,6 +7,8 @@ import { AIQuizPage } from "../pages/ai-quiz-page";
 import { ActionDetailPage } from "../pages/action-detail-page";
 import { ActionHistoryPage } from "../pages/action-history-page";
 import { DonationPage } from "../pages/donation-page";
+import { DonationDetailPage } from "../pages/donation-detail-page";
+import { DonationHistoryPage } from "../pages/donation-history-page";
 import { HazardReportPage } from "../pages/hazard-report-page";
 import { LandingPage } from "../pages/landing-page";
 import { LoginPage } from "../pages/login-page";
@@ -52,6 +54,16 @@ export function AppRoutes() {
         <Route path="/map" element={<MapMonitoringPage />} />
         <Route path="/news" element={<NewsPage />} />
         <Route path="/news/:id" element={<NewsDetailPage />} />
+        <Route path="/donation/:id" element={<DonationDetailPage />} />
+        <Route path="/donations/:id" element={<DonationDetailPage />} />
+        <Route
+          path="/donation-history"
+          element={
+            <AuthGuard allow={["user"]}>
+              <DonationHistoryPage />
+            </AuthGuard>
+          }
+        />
         <Route
           path="/hazard-report"
           element={
