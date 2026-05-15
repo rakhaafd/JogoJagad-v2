@@ -1,4 +1,5 @@
 import {
+  AlertCircle,
   Bot,
   Heart,
   House,
@@ -30,4 +31,5 @@ export const navIconMap: Record<string, LucideIcon> = {
   list: List,
   users: Users,
   "file-text": FileText,
+  "alert-circle": AlertCircle,
 };
