@@ -19,6 +19,9 @@ import { ProfilePage } from "../pages/profile-page";
 import { RegisterPage } from "../pages/register-page";
 import { UserManagementPage } from "../pages/user-management-page";
 import { ActionReportsPage } from "../pages/action-reports-page";
+import { AdminNewsPage } from "../pages/admin-news-page";
+import { AdminNewsCreatePage } from "../pages/admin-news-create-page";
+import { AdminNewsEditPage } from "../pages/admin-news-edit-page";
 import { UserDashboardPage } from "../pages/user-dashboard-page";
 import { AuthGuard } from "../middleware/authGuard";
 
@@ -112,6 +115,30 @@ export function AppRoutes() {
           element={
             <AuthGuard allow={["admin"]}>
               <ActionReportsPage />
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/admin/news"
+          element={
+            <AuthGuard allow={["admin"]}>
+              <AdminNewsPage />
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/admin/news/create"
+          element={
+            <AuthGuard allow={["admin"]}>
+              <AdminNewsCreatePage />
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/admin/news/:id/edit"
+          element={
+            <AuthGuard allow={["admin"]}>
+              <AdminNewsEditPage />
             </AuthGuard>
           }
         />

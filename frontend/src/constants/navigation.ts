@@ -20,7 +20,7 @@ export const adminAppNavigation: NavItem[] = [
   { label: "Admin Dashboard", path: "/admin", icon: "shield-check" },
   { label: "User Management", path: "/admin/users", icon: "users" },
   { label: "Action Reports", path: "/admin/actions", icon: "file-text" },
-  { label: "News", path: "/news", icon: "newspaper" },
+  { label: "News Management", path: "/admin/news", icon: "newspaper" },
   { label: "Donation", path: "/donation", icon: "wallet" },
   { label: "AI Quiz", path: "/ai-quiz", icon: "bot" },
 ];
