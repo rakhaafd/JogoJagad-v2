@@ -4,7 +4,17 @@ import type {
   LoginPayload,
   MeResponse,
   RegisterPayload,
+  User,
 } from "../types";
+
+export interface ProfileUpdatePayload {
+  name?: string;
+  email?: string;
+  password?: string;
+  kecamatan?: string;
+  kota?: string;
+  provinsi?: string;
+}
 
 export const authService = {
   async login(payload: LoginPayload) {
@@ -44,6 +54,14 @@ export const authService = {
 
   async me() {
     return apiFetch<MeResponse>("/me");
+  },
+
+  async updateProfile(payload: ProfileUpdatePayload) {
+    const data = await apiFetch<{ user: User }>("/me", {
+      method: "PATCH",
+      body: payload,
+    });
+    return data.user;
   },
 
   async logout() {

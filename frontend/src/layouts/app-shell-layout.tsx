@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { LogOut, Menu } from "lucide-react";
+import { CircleUserRound, LogOut, Menu } from "lucide-react";
 import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { navIconMap } from "../components/shared/nav-icons";
@@ -66,6 +66,14 @@ export function AppShellLayout() {
                   <Button
                     variant="ghost"
                     className="w-full justify-start gap-3"
+                    onClick={() => navigate("/profile")}
+                  >
+                    <CircleUserRound className="h-4 w-4" />
+                    Profile
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start gap-3"
                     onClick={async () => {
                       try {
                         await logout();
@@ -129,6 +137,17 @@ export function AppShellLayout() {
                 <div className="mt-auto">
                   {isAuthenticated ? (
                     <div className="pt-2">
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start gap-3"
+                        onClick={() => {
+                          setOpen(false);
+                          navigate("/profile");
+                        }}
+                      >
+                        <CircleUserRound className="h-4 w-4" />
+                        Profile
+                      </Button>
                       <Button
                         variant="ghost"
                         className="w-full justify-start gap-3"

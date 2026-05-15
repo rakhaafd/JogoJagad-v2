@@ -15,6 +15,7 @@ import { MapMonitoringPage } from "../pages/map-monitoring-page";
 import { NewsPage } from "../pages/news-page";
 import { NewsDetailPage } from "../pages/news-detail-page";
 import { NotFoundPage } from "../pages/not-found-page";
+import { ProfilePage } from "../pages/profile-page";
 import { RegisterPage } from "../pages/register-page";
 import { UserManagementPage } from "../pages/user-management-page";
 import { UserDashboardPage } from "../pages/user-dashboard-page";
@@ -81,6 +82,14 @@ export function AppRoutes() {
         />
         <Route path="/donation" element={<DonationPage />} />
         <Route path="/ai-quiz" element={<AIQuizPage />} />
+        <Route
+          path="/profile"
+          element={
+            <AuthGuard allow={["user", "admin"]}>
+              <ProfilePage />
+            </AuthGuard>
+          }
+        />
         <Route
           path="/admin"
           element={
