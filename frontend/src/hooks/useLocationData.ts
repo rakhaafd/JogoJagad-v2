@@ -5,6 +5,13 @@ import {
   type LocationItem,
 } from "../services/locationService";
 
+function toOptions(items: LocationItem[]) {
+  return items.map((item) => ({
+    label: item.name,
+    value: item.code,
+  }));
+}
+
 // Simple in-memory cache
 const cache = {
   provinces: null as LocationItem[] | null,
@@ -33,21 +40,11 @@ export function useLocationData() {
 
         // Check cache first
         if (cache.provinces) {
-          setProvinces(
-            cache.provinces.map((p) => ({
-              label: p.name,
-              value: p.code,
-            })),
-          );
+          setProvinces(toOptions(cache.provinces));
         } else {
           const data = await locationService.getProvinces();
           cache.provinces = data;
-          setProvinces(
-            data.map((p) => ({
-              label: p.name,
-              value: p.code,
-            })),
-          );
+          setProvinces(toOptions(data));
         }
       } catch (error) {
         console.error("Error fetching provinces:", error);
@@ -65,7 +62,7 @@ export function useLocationData() {
       setRegencies([]);
       setDistricts([]);
       setVillages([]);
-      return;
+      return [];
     }
 
     try {
@@ -73,21 +70,15 @@ export function useLocationData() {
 
       // Check cache first
       if (cache.regencies[provinceCode]) {
-        setRegencies(
-          cache.regencies[provinceCode].map((r) => ({
-            label: r.name,
-            value: r.code,
-          })),
-        );
+        const options = toOptions(cache.regencies[provinceCode]);
+        setRegencies(options);
+        return options;
       } else {
         const data = await locationService.getRegencies(provinceCode);
         cache.regencies[provinceCode] = data;
-        setRegencies(
-          data.map((d) => ({
-            label: d.name,
-            value: d.code,
-          })),
-        );
+        const options = toOptions(data);
+        setRegencies(options);
+        return options;
       }
 
       // Reset districts and villages when province changes
@@ -98,6 +89,7 @@ export function useLocationData() {
       setRegencies([]);
       setDistricts([]);
       setVillages([]);
+      return [];
     } finally {
       setLoading((prev) => ({ ...prev, regencies: false }));
     }
@@ -106,7 +98,7 @@ export function useLocationData() {
   const fetchDistricts2 = useCallback(async (regencyCode: string) => {
     if (!regencyCode) {
       setVillages([]);
-      return;
+      return [];
     }
 
     try {
@@ -114,21 +106,15 @@ export function useLocationData() {
 
       // Check cache first
       if (cache.districts[regencyCode]) {
-        setDistricts(
-          cache.districts[regencyCode].map((d) => ({
-            label: d.name,
-            value: d.code,
-          })),
-        );
+        const options = toOptions(cache.districts[regencyCode]);
+        setDistricts(options);
+        return options;
       } else {
         const data = await locationService.getDistricts(regencyCode);
         cache.districts[regencyCode] = data;
-        setDistricts(
-          data.map((d) => ({
-            label: d.name,
-            value: d.code,
-          })),
-        );
+        const options = toOptions(data);
+        setDistricts(options);
+        return options;
       }
 
       // Reset villages when regency changes
@@ -137,6 +123,7 @@ export function useLocationData() {
       console.error("Error fetching districts:", error);
       setDistricts([]);
       setVillages([]);
+      return [];
     } finally {
       setLoading((prev) => ({ ...prev, districts: false }));
     }
@@ -145,7 +132,7 @@ export function useLocationData() {
   const fetchVillages = useCallback(async (districtCode: string) => {
     if (!districtCode) {
       setVillages([]);
-      return;
+      return [];
     }
 
     try {
@@ -153,25 +140,20 @@ export function useLocationData() {
 
       // Check cache first
       if (cache.villages[districtCode]) {
-        setVillages(
-          cache.villages[districtCode].map((v) => ({
-            label: v.name,
-            value: v.code,
-          })),
-        );
+        const options = toOptions(cache.villages[districtCode]);
+        setVillages(options);
+        return options;
       } else {
         const data = await locationService.getVillages(districtCode);
         cache.villages[districtCode] = data;
-        setVillages(
-          data.map((v) => ({
-            label: v.name,
-            value: v.code,
-          })),
-        );
+        const options = toOptions(data);
+        setVillages(options);
+        return options;
       }
     } catch (error) {
       console.error("Error fetching villages:", error);
       setVillages([]);
+      return [];
     } finally {
       setLoading((prev) => ({ ...prev, villages: false }));
     }

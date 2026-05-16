@@ -1,17 +1,27 @@
 import { RefreshCw } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PageHeader } from "../components/shared/page-header";
 import { Button } from "../components/ui/button";
 import { Card } from "../components/ui/card";
-import { Input } from "../components/ui/input";
 import { Select } from "../components/ui/select";
 import { Textarea } from "../components/ui/textarea";
 import { useToast } from "../components/ui/toast";
+import { useLocationData } from "../hooks/useLocationData";
 import { regionService } from "../services/regionService";
+import type { FieldOption } from "../types";
 import type { RegionPayload } from "../types";
 
-const emptyForm: RegionPayload = {
+type RegionFormValues = {
+  provinsi: string;
+  kota: string;
+  kecamatan: string;
+  kelurahan: string;
+  status: RegionPayload["status"];
+  description: string;
+};
+
+const emptyForm: RegionFormValues = {
   provinsi: "",
   kota: "",
   kecamatan: "",
@@ -20,16 +30,52 @@ const emptyForm: RegionPayload = {
   description: "",
 };
 
+function getOptionLabelByValue(options: FieldOption[], value: string) {
+  return (
+    options.find((option) => String(option.value) === value)?.label ?? value
+  );
+}
+
 export function AdminRegionStatusCreatePage() {
   const navigate = useNavigate();
   const { pushToast } = useToast();
-  const [form, setForm] = useState<RegionPayload>(emptyForm);
+  const {
+    provinces,
+    regencies,
+    districts,
+    villages,
+    fetchRegencies,
+    fetchDistricts,
+    fetchVillages,
+  } = useLocationData();
+  const [form, setForm] = useState<RegionFormValues>(emptyForm);
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    void fetchRegencies(form.provinsi);
+  }, [form.provinsi, fetchRegencies]);
+
+  useEffect(() => {
+    void fetchDistricts(form.kota);
+  }, [form.kota, fetchDistricts]);
+
+  useEffect(() => {
+    void fetchVillages(form.kecamatan);
+  }, [form.kecamatan, fetchVillages]);
 
   const handleSave = useCallback(async () => {
     setSaving(true);
     try {
-      await regionService.create(form);
+      const payload: RegionPayload = {
+        provinsi: getOptionLabelByValue(provinces, form.provinsi),
+        kota: getOptionLabelByValue(regencies, form.kota),
+        kecamatan: getOptionLabelByValue(districts, form.kecamatan),
+        kelurahan: getOptionLabelByValue(villages, form.kelurahan),
+        status: form.status,
+        description: form.description,
+      };
+
+      await regionService.create(payload);
       pushToast("Region created.");
       navigate("/admin/regions");
     } catch {
@@ -50,43 +96,85 @@ export function AdminRegionStatusCreatePage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="space-y-2 text-sm font-medium">
               <span>Provinsi</span>
-              <Input
+              <Select
                 value={form.provinsi}
                 onChange={(e) =>
-                  setForm((p) => ({ ...p, provinsi: e.target.value }))
+                  setForm((p) => ({
+                    ...p,
+                    provinsi: e.target.value,
+                    kota: "",
+                    kecamatan: "",
+                    kelurahan: "",
+                  }))
                 }
-                placeholder="Provinsi"
-              />
+              >
+                <option value="">Select Province</option>
+                {provinces.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </Select>
             </label>
             <label className="space-y-2 text-sm font-medium">
               <span>Kota</span>
-              <Input
+              <Select
                 value={form.kota}
                 onChange={(e) =>
-                  setForm((p) => ({ ...p, kota: e.target.value }))
+                  setForm((p) => ({
+                    ...p,
+                    kota: e.target.value,
+                    kecamatan: "",
+                    kelurahan: "",
+                  }))
                 }
-                placeholder="Kota"
-              />
+                disabled={!form.provinsi}
+              >
+                <option value="">Select Kabupaten/Kota</option>
+                {regencies.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </Select>
             </label>
             <label className="space-y-2 text-sm font-medium">
               <span>Kecamatan</span>
-              <Input
+              <Select
                 value={form.kecamatan}
                 onChange={(e) =>
-                  setForm((p) => ({ ...p, kecamatan: e.target.value }))
+                  setForm((p) => ({
+                    ...p,
+                    kecamatan: e.target.value,
+                    kelurahan: "",
+                  }))
                 }
-                placeholder="Kecamatan"
-              />
+                disabled={!form.kota}
+              >
+                <option value="">Select Kecamatan</option>
+                {districts.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </Select>
             </label>
             <label className="space-y-2 text-sm font-medium">
               <span>Kelurahan</span>
-              <Input
+              <Select
                 value={form.kelurahan}
                 onChange={(e) =>
                   setForm((p) => ({ ...p, kelurahan: e.target.value }))
                 }
-                placeholder="Kelurahan"
-              />
+                disabled={!form.kecamatan}
+              >
+                <option value="">Select Kelurahan</option>
+                {villages.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </Select>
             </label>
           </div>
 
