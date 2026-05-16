@@ -31,6 +31,7 @@ import { AdminRegionStatusDetailPage } from "../pages/admin-region-status-detail
 import { AdminRegionStatusCreatePage } from "../pages/admin-region-status-create-page";
 import { AdminRegionStatusEditPage } from "../pages/admin-region-status-edit-page";
 import { UserDashboardPage } from "../pages/user-dashboard-page";
+import { AdminRegisterPage } from "../pages/admin-register-page";
 import { AuthGuard } from "../middleware/authGuard";
 
 export function AppRoutes() {
@@ -45,6 +46,14 @@ export function AppRoutes() {
           element={
             <AuthGuard allow={["user"]}>
               <UserDashboardPage />
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/admin/register"
+          element={
+            <AuthGuard allow={["admin"]}>
+              <AdminRegisterPage />
             </AuthGuard>
           }
         />

@@ -1,9 +1,6 @@
 import { Activity, Gift, Heart } from "lucide-react";
 import { PageHeader } from "../components/shared/page-header";
 import { StatCard } from "../components/shared/stat-card";
-import { Card } from "../components/ui/card";
-import { Skeleton } from "../components/ui/skeleton";
-import { NotificationsPanel } from "../fragments/dashboard/notifications-panel";
 import { QuickActions } from "../fragments/dashboard/quick-actions";
 import { WeatherWidget } from "../fragments/dashboard/weather-widget";
 import { MonitoringMap } from "../fragments/map/monitoring-map";
@@ -73,24 +70,13 @@ export function UserDashboardPage() {
         />
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr] items-start">
-        <div className="space-y-6">
+      <div className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr] xl:items-stretch">
+        <div className="space-y-6 h-full">
           <WeatherWidget />
-
-          <Card className="space-y-3 p-4">
-            <p className="text-sm font-medium text-muted-foreground">
-              Data Synchronization
-            </p>
-            <Skeleton className="h-5 w-2/3" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-5/6" />
-          </Card>
-
-          <QuickActions />
         </div>
 
-        <div className="self-start">
-          <NotificationsPanel />
+        <div className="h-full">
+          <QuickActions />
         </div>
       </div>
 

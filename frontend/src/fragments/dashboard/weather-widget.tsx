@@ -13,7 +13,7 @@ export function WeatherWidget() {
   const tempCelsius = Math.round(tempKelvin - 273.15);
 
   return (
-    <Card glass>
+    <Card className="h-full" glass>
       {loading ? (
         <div className="space-y-3">
           <Skeleton className="h-4 w-24" />

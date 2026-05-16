@@ -1,4 +1,4 @@
-import { Gift, MessageCircleHeart, Siren, Wallet } from "lucide-react";
+import { MessageCircleHeart, Newspaper, Siren, Wallet } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card } from "../../components/ui/card";
 
@@ -16,10 +16,10 @@ const quickActions = [
     path: "/ai-quiz",
   },
   {
-    icon: Gift,
-    label: "Submit Action",
-    description: "Upload preventive action proof",
-    path: "/hazard-report",
+    icon: Newspaper,
+    label: "News",
+    description: "Read the latest disaster updates",
+    path: "/news",
   },
   {
     icon: Wallet,
@@ -31,7 +31,7 @@ const quickActions = [
 
 export function QuickActions() {
   return (
-    <Card className="space-y-4">
+    <Card className="h-full space-y-4">
       <h3 className="text-lg font-semibold">Quick Actions</h3>
       <div className="grid gap-3 sm:grid-cols-2">
         {quickActions.map((action) => (

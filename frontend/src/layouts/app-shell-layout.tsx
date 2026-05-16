@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { CircleUserRound, LogOut, Menu } from "lucide-react";
+import { CircleUserRound, LogOut, Menu, UserPlus } from "lucide-react";
 import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { navIconMap } from "../components/shared/nav-icons";
@@ -46,7 +46,7 @@ function AppNav({ onNavigate }: { onNavigate?: () => void }) {
 
 export function AppShellLayout() {
   const [open, setOpen] = useState(false);
-  const { logout, isAuthenticated } = useAuth();
+  const { logout, isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
 
   return (
@@ -64,6 +64,16 @@ export function AppShellLayout() {
             <div className="mt-auto">
               {isAuthenticated ? (
                 <div className="pt-2">
+                  {user?.role === "admin" ? (
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start gap-3"
+                      onClick={() => navigate("/admin/register")}
+                    >
+                      <UserPlus className="h-4 w-4" />
+                      Register Admin
+                    </Button>
+                  ) : null}
                   <Button
                     variant="ghost"
                     className="w-full justify-start gap-3"
@@ -138,6 +148,19 @@ export function AppShellLayout() {
                 <div className="mt-auto">
                   {isAuthenticated ? (
                     <div className="pt-2">
+                      {user?.role === "admin" ? (
+                        <Button
+                          variant="ghost"
+                          className="w-full justify-start gap-3"
+                          onClick={() => {
+                            setOpen(false);
+                            navigate("/admin/register");
+                          }}
+                        >
+                          <UserPlus className="h-4 w-4" />
+                          Register Admin
+                        </Button>
+                      ) : null}
                       <Button
                         variant="ghost"
                         className="w-full justify-start gap-3"
