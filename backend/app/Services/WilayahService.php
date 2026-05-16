@@ -35,13 +35,7 @@ class WilayahService
             return null;
         }
 
-        foreach ($items ?? [] as $item) {
-            if ($this->normalize($item['name'] ?? '') === $this->normalize($name)) {
-                return $item['id'] ?? null;
-            }
-        }
-
-        return null;
+        return $this->resolveAreaId($items, $name);
     }
 
     private function findRegencyCodeByName(string $provinceCode, string $name): ?string
@@ -51,13 +45,7 @@ class WilayahService
             return null;
         }
 
-        foreach ($items ?? [] as $item) {
-            if ($this->normalize($item['name'] ?? '') === $this->normalize($name)) {
-                return $item['id'] ?? null;
-            }
-        }
-
-        return null;
+        return $this->resolveAreaId($items, $name);
     }
 
     private function findDistrictCodeByName(string $regencyCode, string $name): ?string
@@ -67,13 +55,7 @@ class WilayahService
             return null;
         }
 
-        foreach ($items ?? [] as $item) {
-            if ($this->normalize($item['name'] ?? '') === $this->normalize($name)) {
-                return $item['id'] ?? null;
-            }
-        }
-
-        return null;
+        return $this->resolveAreaId($items, $name);
     }
 
     private function findVillageCodeByName(string $districtCode, string $name): ?string
@@ -83,28 +65,53 @@ class WilayahService
             return null;
         }
 
-        foreach ($items ?? [] as $item) {
-            if ($this->normalize($item['name'] ?? '') === $this->normalize($name)) {
-                return $item['id'] ?? null;
-            }
-        }
-
-        return null;
+        return $this->resolveAreaId($items, $name);
     }
 
     private function getJson(string $url): ?array
     {
-        $response = Http::timeout(10)->get($url);
+        try {
+            $response = Http::timeout(10)->get($url);
 
-        if (! $response->ok()) {
+            if (! $response->ok()) {
+                return null;
+            }
+
+            return $response->json();
+        } catch (\Throwable $e) {
+            logger()->warning('Failed to fetch wilayah data: ' . $e->getMessage());
             return null;
         }
-
-        return $response->json();
     }
 
     private function normalize(string $value): string
     {
         return mb_strtolower(trim($value));
+    }
+
+    private function normalizeCode(string $value): string
+    {
+        return preg_replace('/\D+/', '', $value) ?? '';
+    }
+
+    private function resolveAreaId(array $items, string $value): ?string
+    {
+        $normalizedName = $this->normalize($value);
+        $normalizedCode = $this->normalizeCode($value);
+
+        foreach ($items as $item) {
+            $itemId = (string) ($item['id'] ?? '');
+            $itemName = (string) ($item['name'] ?? '');
+
+            if ($normalizedCode !== '' && $this->normalizeCode($itemId) === $normalizedCode) {
+                return $itemId;
+            }
+
+            if ($this->normalize($itemName) === $normalizedName) {
+                return $itemId !== '' ? $itemId : null;
+            }
+        }
+
+        return null;
     }
 }

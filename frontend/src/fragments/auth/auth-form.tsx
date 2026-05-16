@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import type { FormEvent } from "react";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../../components/ui/button";
 import { Card } from "../../components/ui/card";
@@ -8,7 +8,9 @@ import { DynamicForm } from "../../components/shared/dynamic-form";
 import { useMutation } from "../../composables/useMutation";
 import { useAuth } from "../../hooks/useAuth";
 import { useToast } from "../../components/ui/toast";
+import { useLocationData } from "../../hooks/useLocationData";
 import { buildFormFields } from "../../utils/form";
+import { extractApiError } from "../../utils/errorHandler";
 import type {
   FormFieldConfig,
   LoginPayload,
@@ -26,6 +28,15 @@ export function AuthForm({ mode }: AuthFormProps) {
   const navigate = useNavigate();
   const { login, register } = useAuth();
   const { pushToast } = useToast();
+  const {
+    provinces,
+    regencies,
+    districts,
+    villages,
+    fetchRegencies,
+    fetchDistricts,
+    fetchVillages,
+  } = useLocationData();
   const [formValues, setFormValues] = useState({
     role: "user" as UserRole,
     name: "",
@@ -40,6 +51,27 @@ export function AuthForm({ mode }: AuthFormProps) {
   const loginMutation = useMutation<User, LoginPayload>(login);
   const registerMutation = useMutation<User, RegisterPayload>(register);
   const mutation = isLogin ? loginMutation : registerMutation;
+
+  // Fetch regencies when province changes
+  useEffect(() => {
+    if (formValues.provinsi) {
+      void fetchRegencies(formValues.provinsi);
+    }
+  }, [formValues.provinsi, fetchRegencies]);
+
+  // Fetch districts when regency/kabupaten changes
+  useEffect(() => {
+    if (formValues.kota) {
+      void fetchDistricts(formValues.kota);
+    }
+  }, [formValues.kota, fetchDistricts]);
+
+  // Fetch villages when district/kecamatan changes
+  useEffect(() => {
+    if (formValues.kecamatan) {
+      void fetchVillages(formValues.kecamatan);
+    }
+  }, [formValues.kecamatan, fetchVillages]);
 
   const fields = useMemo<FormFieldConfig[]>(() => {
     if (isLogin) {
@@ -77,13 +109,49 @@ export function AuthForm({ mode }: AuthFormProps) {
     const fieldOverrides: Record<string, Partial<FormFieldConfig>> = {
       password: { type: "password", autoComplete: "new-password" },
       email: { type: "email", autoComplete: "email" },
+      provinsi: {
+        type: "select",
+        label: "Provinsi",
+        options: provinces,
+        placeholder: "Select Province",
+      },
+      kota: {
+        type: "select",
+        label: "Kabupaten/Kota",
+        options: regencies,
+        placeholder: "Select Kabupaten/Kota",
+        disabled: !formValues.provinsi,
+      },
+      kecamatan: {
+        type: "select",
+        label: "Kecamatan",
+        options: districts, // Same as kota since kecamatan is in same API
+        placeholder: "Select Kecamatan",
+        disabled: !formValues.kota,
+      },
+      kelurahan: {
+        type: "select",
+        label: "Kelurahan",
+        options: villages,
+        placeholder: "Select Kelurahan",
+        disabled: !formValues.kecamatan,
+      },
     };
 
     return buildFormFields(basePayload, fieldOverrides);
-  }, [formValues, isLogin]);
+  }, [formValues, isLogin, provinces, regencies, districts, villages]);
 
   const handleChange = (name: keyof typeof formValues, value: unknown) => {
     setFormValues((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const getOptionLabelByValue = (
+    options: Array<{ label: string; value: string | number }>,
+    value: string,
+  ) => {
+    return (
+      options.find((option) => String(option.value) === value)?.label ?? value
+    );
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -102,10 +170,10 @@ export function AuthForm({ mode }: AuthFormProps) {
           name: formValues.name,
           email: formValues.email,
           password: formValues.password,
-          provinsi: formValues.provinsi,
-          kota: formValues.kota,
-          kecamatan: formValues.kecamatan,
-          kelurahan: formValues.kelurahan,
+          provinsi: getOptionLabelByValue(provinces, formValues.provinsi),
+          kota: getOptionLabelByValue(regencies, formValues.kota),
+          kecamatan: getOptionLabelByValue(districts, formValues.kecamatan),
+          kelurahan: getOptionLabelByValue(villages, formValues.kelurahan),
         });
       }
 
@@ -115,8 +183,18 @@ export function AuthForm({ mode }: AuthFormProps) {
       navigate(authenticatedUser.role === "admin" ? "/admin" : "/dashboard", {
         replace: true,
       });
-    } catch {
-      pushToast("Please review the form and try again.", "info");
+    } catch (error) {
+      const parsed = extractApiError(error);
+      const firstValidationError = parsed.validationErrors
+        ? Object.values(parsed.validationErrors)[0]?.[0]
+        : undefined;
+
+      pushToast(
+        firstValidationError ??
+          parsed.message ??
+          "Please review the form and try again.",
+        "info",
+      );
     }
   };
 

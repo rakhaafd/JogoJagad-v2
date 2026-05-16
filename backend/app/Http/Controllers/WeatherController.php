@@ -8,9 +8,7 @@ use Illuminate\Http\Response;
 
 class WeatherController extends Controller
 {
-    public function __construct(private readonly WeatherService $weatherService)
-    {
-    }
+    public function __construct(private readonly WeatherService $weatherService) {}
 
     public function current(Request $request): Response
     {
@@ -25,10 +23,13 @@ class WeatherController extends Controller
         $result = $this->weatherService->getCurrentByCity($city);
 
         if (! $result['ok']) {
+            $status = $result['status'] ?? 502;
+            $errorMessage = $result['error']['message'] ?? 'Gagal mengambil data cuaca.';
+
             return response([
-                'message' => 'Gagal mengambil data cuaca.',
+                'message' => $errorMessage,
                 'error' => $result['error'],
-            ], 502);
+            ], $status >= 400 ? $status : 502);
         }
 
         return response([

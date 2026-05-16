@@ -4,11 +4,20 @@ use App\Http\Controllers\ActionController;
 use App\Http\Controllers\AiController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DonationController;
+use App\Http\Controllers\LocationController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\RegionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WeatherController;
 use Illuminate\Support\Facades\Route;
+
+// Public routes for location data (used in registration form)
+Route::prefix('locations')->group(function () {
+    Route::get('/provinces', [LocationController::class, 'getProvinces']);
+    Route::get('/regencies', [LocationController::class, 'getRegencies']);
+    Route::get('/districts', [LocationController::class, 'getDistricts']);
+    Route::get('/villages', [LocationController::class, 'getVillages']);
+});
 
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'registerUser']);
