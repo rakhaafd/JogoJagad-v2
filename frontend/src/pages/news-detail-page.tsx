@@ -7,6 +7,7 @@ import { EmptyState } from "../components/shared/empty-state";
 import { Skeleton } from "../components/ui/skeleton";
 import { useApi } from "../composables/useApi";
 import { newsService } from "../services/newsService";
+import { getStorageUrl } from "../utils/storage";
 
 export function NewsDetailPage() {
   const { id } = useParams();
@@ -39,17 +40,28 @@ export function NewsDetailPage() {
           animate={{ opacity: 1, y: 0 }}
         >
           <Card>
-            <div className="flex items-start justify-between">
-              <div>
-                <h2 className="text-2xl font-semibold">{news.title}</h2>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  By {news.author?.name ?? "Unknown"} ·{" "}
-                  {new Date(news.created_at).toLocaleString("id-ID")}
-                </p>
+            {news.thumbnail_path ? (
+              <div className="h-64 w-full overflow-hidden">
+                <img
+                  src={getStorageUrl(news.thumbnail_path)}
+                  alt={news.title}
+                  className="h-full w-full object-cover"
+                />
               </div>
-            </div>
-            <div className="mt-4 prose max-w-none dark:prose-invert">
-              <div className="whitespace-pre-wrap">{news.content}</div>
+            ) : null}
+            <div className="p-4">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h2 className="text-2xl font-semibold">{news.title}</h2>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    By {news.author?.name ?? "Unknown"} ·{" "}
+                    {new Date(news.created_at).toLocaleString("id-ID")}
+                  </p>
+                </div>
+              </div>
+              <div className="mt-4 prose max-w-none dark:prose-invert">
+                <div className="whitespace-pre-wrap">{news.content}</div>
+              </div>
             </div>
           </Card>
 

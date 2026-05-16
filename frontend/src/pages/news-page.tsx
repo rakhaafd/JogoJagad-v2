@@ -9,6 +9,7 @@ import { EmptyState } from "../components/shared/empty-state";
 import { Skeleton } from "../components/ui/skeleton";
 import { useApi } from "../composables/useApi";
 import { newsService } from "../services/newsService";
+import { getStorageUrl } from "../utils/storage";
 
 export function NewsPage() {
   const { data: news = [], loading, error } = useApi(newsService.list);
@@ -51,14 +52,27 @@ export function NewsPage() {
               >
                 <Link to={`/news/${article.id}`} className="block">
                   <Card>
-                    <Badge>{article.category}</Badge>
-                    <h3 className="mt-2 font-semibold">{article.title}</h3>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {article.content.slice(0, 120)}...
-                    </p>
-                    <p className="mt-2 text-xs text-muted-foreground">
-                      {new Date(article.created_at).toLocaleDateString("id-ID")}
-                    </p>
+                    {article.thumbnail_path ? (
+                      <div className="h-40 w-full overflow-hidden rounded-md">
+                        <img
+                          src={getStorageUrl(article.thumbnail_path)}
+                          alt={article.title}
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+                    ) : null}
+                    <div className="mt-3">
+                      <Badge>{article.category}</Badge>
+                      <h3 className="mt-2 font-semibold">{article.title}</h3>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {article.content.slice(0, 120)}...
+                      </p>
+                      <p className="mt-2 text-xs text-muted-foreground">
+                        {new Date(article.created_at).toLocaleDateString(
+                          "id-ID",
+                        )}
+                      </p>
+                    </div>
                   </Card>
                 </Link>
               </motion.div>
