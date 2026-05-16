@@ -28,6 +28,14 @@ Route::prefix('auth')->group(function () {
 
 Route::post('/donations/webhook', [DonationController::class, 'webhook']);
 
+// Public content routes for landing and unauthenticated pages
+Route::get('/regions', [RegionController::class, 'index']);
+Route::get('/regions/{region}', [RegionController::class, 'show']);
+Route::get('/news', [NewsController::class, 'index']);
+Route::get('/news/{id}', [NewsController::class, 'show']);
+Route::get('/donations', [DonationController::class, 'index']);
+Route::get('/donations/{id}', [DonationController::class, 'show']);
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
@@ -39,19 +47,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/actions/{id}', [ActionController::class, 'update']);
     Route::delete('/actions/{id}', [ActionController::class, 'destroy']);
 
-    Route::get('/regions', [RegionController::class, 'index']);
-    Route::get('/regions/{region}', [RegionController::class, 'show']);
-
-    Route::get('/news', [NewsController::class, 'index']);
-    Route::get('/news/{id}', [NewsController::class, 'show']);
-
     Route::post('/ai/ask', [AiController::class, 'ask']);
     Route::post('/ai/quiz/generate', [AiController::class, 'generateQuiz']);
     Route::post('/ai/quiz/submit', [AiController::class, 'submitQuiz']);
 
-    Route::get('/donations', [DonationController::class, 'index']);
     Route::get('/donations/history', [DonationController::class, 'userHistory']);
-    Route::get('/donations/{id}', [DonationController::class, 'show']);
     Route::post('/donations/{id}/donate', [DonationController::class, 'donate']);
 
     Route::middleware(\App\Http\Middleware\CheckAdmin::class)->prefix('admin')->group(function () {

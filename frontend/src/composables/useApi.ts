@@ -47,7 +47,7 @@ export function useApi<T>(
         error: parsed.message,
         validationErrors: parsed.validationErrors,
       }));
-      throw error;
+      return undefined;
     }
   }, [fetcher]);
 
