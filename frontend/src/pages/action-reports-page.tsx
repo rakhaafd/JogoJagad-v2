@@ -33,17 +33,17 @@ export function ActionReportsPage() {
   const [verifyForm, setVerifyForm] = useState<{
     category: string;
     notes: string;
-  }>({ category: "moderate", notes: "" });
+  }>({ category: "Moderate", notes: "" });
   const [verifying, setVerifying] = useState(false);
 
   const openVerifyModal = useCallback((id: number) => {
     setVerifyingActionId(id);
-    setVerifyForm({ category: "moderate", notes: "" });
+    setVerifyForm({ category: "Moderate", notes: "" });
   }, []);
 
   const closeVerifyModal = useCallback(() => {
     setVerifyingActionId(null);
-    setVerifyForm({ category: "moderate", notes: "" });
+    setVerifyForm({ category: "Moderate", notes: "" });
   }, []);
 
   const handleSubmitVerify = useCallback(async () => {
@@ -217,9 +217,9 @@ export function ActionReportsPage() {
               }
               disabled={verifying}
             >
-              <option value="minor">Minor</option>
-              <option value="major">Major</option>
-              <option value="moderate">Moderate</option>
+              <option value="Minor">Minor</option>
+              <option value="Major">Major</option>
+              <option value="Moderate">Moderate</option>
             </Select>
           </div>
 

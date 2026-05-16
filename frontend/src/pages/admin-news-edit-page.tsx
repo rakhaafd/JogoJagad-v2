@@ -11,6 +11,14 @@ import { useToast } from "../components/ui/toast";
 import { newsService } from "../services/newsService";
 import type { NewsUpsertPayload } from "../types";
 
+interface NewsFormState {
+  title: string;
+  category: string;
+  content: string;
+  thumbnail: File | null;
+  currentThumbnailPath: string | null;
+}
+
 export function AdminNewsEditPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -22,10 +30,12 @@ export function AdminNewsEditPage() {
     immediate: Boolean(id),
   });
 
-  const [form, setForm] = useState<NewsUpsertPayload>({
+  const [form, setForm] = useState<NewsFormState>({
     title: "",
     category: "",
     content: "",
+    thumbnail: null,
+    currentThumbnailPath: null,
   });
   const [saving, setSaving] = useState(false);
 
@@ -36,6 +46,8 @@ export function AdminNewsEditPage() {
           title: data.title || "",
           category: data.category || "",
           content: data.content || "",
+          thumbnail: null,
+          currentThumbnailPath: data.thumbnail_path || null,
         });
       });
     }
@@ -45,7 +57,17 @@ export function AdminNewsEditPage() {
     if (!id) return;
     setSaving(true);
     try {
-      await newsService.update(Number(id), form);
+      const payload: NewsUpsertPayload = {
+        title: form.title.trim(),
+        category: form.category.trim(),
+        content: form.content.trim(),
+      };
+
+      if (form.thumbnail) {
+        payload.thumbnail = form.thumbnail;
+      }
+
+      await newsService.update(Number(id), payload);
       pushToast("News updated.");
       navigate("/admin/news");
     } catch {
@@ -94,6 +116,49 @@ export function AdminNewsEditPage() {
               rows={5}
             />
           </label>
+
+          <div className="space-y-2 text-sm font-medium">
+            <span>Image</span>
+            <label className="block cursor-pointer rounded-2xl border border-dashed border-border bg-muted/20 p-4 transition hover:border-primary/50 hover:bg-muted/40">
+              <input
+                type="file"
+                accept="image/*"
+                className="sr-only"
+                onChange={(e) =>
+                  setForm((p) => ({
+                    ...p,
+                    thumbnail: e.target.files?.[0] ?? null,
+                  }))
+                }
+              />
+              <div className="space-y-2">
+                <p className="font-medium">
+                  {form.thumbnail ? form.thumbnail.name : "Choose an image"}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Click to replace the news cover image.
+                </p>
+              </div>
+            </label>
+          </div>
+
+          <div className="space-y-2 text-xs text-muted-foreground">
+            {form.thumbnail ? (
+              <div className="rounded-2xl border border-border bg-muted/20 p-3">
+                Selected image:{" "}
+                <span className="font-medium text-foreground">
+                  {form.thumbnail.name}
+                </span>
+              </div>
+            ) : form.currentThumbnailPath ? (
+              <div className="rounded-2xl border border-border bg-muted/20 p-3">
+                Current image:{" "}
+                <span className="break-all font-medium text-foreground">
+                  {form.currentThumbnailPath}
+                </span>
+              </div>
+            ) : null}
+          </div>
 
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={() => navigate(-1)}>
