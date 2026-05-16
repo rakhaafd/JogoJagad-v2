@@ -23,6 +23,7 @@ import { useMutation } from "../composables/useMutation";
 import { donationService } from "../services/donationService";
 import { buildFormFields } from "../utils/form";
 import { formatCurrency, formatNumber } from "../utils/format";
+import { getStorageUrl } from "../utils/storage";
 import type { DonationCreatePayload, FormFieldConfig } from "../types";
 
 function getDonationStatusTone(status: string) {
@@ -79,7 +80,8 @@ export function DonationDetailPage() {
         amount: {
           label: "Donation Amount (IDR)",
           type: "number",
-          placeholder: "Masukkan nominal donasi (IDR)",
+          placeholder: "Minimal 10000",
+          hint: "Minimal donasi Rp10.000",
         },
       },
     );
@@ -89,8 +91,19 @@ export function DonationDetailPage() {
     event: React.FormEvent<HTMLFormElement>,
   ) => {
     event.preventDefault();
+
+    const normalizedAmount = Number(donationForm.amount);
+    if (!Number.isFinite(normalizedAmount) || normalizedAmount < 10000) {
+      pushToast("Nominal donasi minimal Rp10.000.", "info");
+      return;
+    }
+
+    const payload: DonationCreatePayload = {
+      amount: Math.trunc(normalizedAmount),
+    };
+
     try {
-      const result = await donateMutation.mutate(donationForm);
+      const result = await donateMutation.mutate(payload);
       pushToast("Donation submitted successfully!");
       setShowDonationModal(false);
       setDonationForm({ amount: 0 });
@@ -107,6 +120,7 @@ export function DonationDetailPage() {
   const totalRaised = campaign?.current_amount ?? 0;
   const targetAmount = campaign?.target_amount ?? 0;
   const progress = targetAmount ? (totalRaised / targetAmount) * 100 : 0;
+  const isDonationAmountValid = Number(donationForm.amount) >= 10000;
 
   return (
     <div className="space-y-4">
@@ -154,7 +168,7 @@ export function DonationDetailPage() {
               <div className="relative h-64 w-full bg-muted">
                 {campaign.image_path ? (
                   <img
-                    src={campaign.image_path}
+                    src={getStorageUrl(campaign.image_path)}
                     alt={campaign.title}
                     className="h-full w-full object-cover"
                   />
@@ -330,7 +344,7 @@ export function DonationDetailPage() {
             <Button
               className="w-full"
               type="submit"
-              disabled={donateMutation.loading}
+              disabled={donateMutation.loading || !isDonationAmountValid}
             >
               {donateMutation.loading ? "Processing..." : "Submit Donation"}
             </Button>

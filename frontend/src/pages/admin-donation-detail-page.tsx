@@ -12,6 +12,7 @@ import { Skeleton } from "../components/ui/skeleton";
 import { useToast } from "../components/ui/toast";
 import { useApi } from "../composables/useApi";
 import { donationService } from "../services/donationService";
+import { getStorageUrl } from "../utils/storage";
 import { formatCurrency, formatNumber } from "../utils/format";
 import type { Donation } from "../types";
 
@@ -149,7 +150,7 @@ export function AdminDonationDetailPage() {
               <div className="relative h-72 w-full bg-muted">
                 {campaign.image_path ? (
                   <img
-                    src={campaign.image_path}
+                    src={getStorageUrl(campaign.image_path)}
                     alt={campaign.title}
                     className="h-full w-full object-cover"
                   />

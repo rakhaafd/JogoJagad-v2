@@ -5,11 +5,12 @@ import { PageHeader } from "../components/shared/page-header";
 import { Button } from "../components/ui/button";
 import { Card } from "../components/ui/card";
 import { Input } from "../components/ui/input";
+import { Select } from "../components/ui/select";
 import { Textarea } from "../components/ui/textarea";
 import { useApi } from "../composables/useApi";
 import { useToast } from "../components/ui/toast";
 import { regionService } from "../services/regionService";
-import type { RegionPayload, RegionStatus } from "../types";
+import type { RegionPayload } from "../types";
 
 export function AdminRegionStatusEditPage() {
   const { id } = useParams();
@@ -118,16 +119,19 @@ export function AdminRegionStatusEditPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="space-y-2 text-sm font-medium">
               <span>Status</span>
-              <Input
+              <Select
                 value={form.status}
                 onChange={(e) =>
                   setForm((p) => ({
                     ...p,
-                    status: e.target.value as RegionStatus,
+                    status: e.target.value as RegionPayload["status"],
                   }))
                 }
-                placeholder="e.g., aman, waspada, siaga"
-              />
+              >
+                <option value="aman">Aman</option>
+                <option value="waspada">Waspada</option>
+                <option value="bahaya">Bahaya</option>
+              </Select>
             </label>
           </div>
 
