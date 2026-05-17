@@ -14,9 +14,9 @@ services:
       DB_CONNECTION: mysql
       DB_HOST: db
       DB_PORT: 3306
-      DB_DATABASE: ${DB_DATABASE:-jogojagad}
-      DB_USERNAME: ${DB_USERNAME:-jogojagad}
-      DB_PASSWORD: ${DB_PASSWORD:-jogojagad123}
+      DB_DATABASE: ${MYSQL_DATABASE:-jogojagad}
+      DB_USERNAME: ${MYSQL_USER:-jogojagad}
+      DB_PASSWORD: ${MYSQL_PASSWORD:-jogojagad123}
     ports:
       - "${APP_PORT:-8080}:80"
     volumes:
@@ -46,9 +46,9 @@ services:
       DB_CONNECTION: mysql
       DB_HOST: db
       DB_PORT: 3306
-      DB_DATABASE: ${DB_DATABASE:-jogojagad}
-      DB_USERNAME: ${DB_USERNAME:-jogojagad}
-      DB_PASSWORD: ${DB_PASSWORD:-jogojagad123}
+      DB_DATABASE: ${MYSQL_DATABASE:-jogojagad}
+      DB_USERNAME: ${MYSQL_USER:-jogojagad}
+      DB_PASSWORD: ${MYSQL_PASSWORD:-jogojagad123}
     command: php artisan queue:work --sleep=3 --tries=3 --timeout=120 --max-time=3600
     volumes:
       - laravel_storage:/var/www/storage
@@ -66,9 +66,9 @@ services:
     container_name: jogojagad-db
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: ${DB_DATABASE:-jogojagad}
-      MYSQL_USER: ${DB_USERNAME:-jogojagad}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-jogojagad123}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-jogojagad}
+      MYSQL_USER: ${MYSQL_USER:-jogojagad}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-jogojagad123}
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root12345}
     ports:
       - "${DB_FORWARD_PORT:-3307}:3306"
