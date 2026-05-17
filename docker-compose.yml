@@ -5,6 +5,8 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        VITE_URL_API: ${VITE_URL_API:-http://backend:80}
     image: jogojagad-frontend:latest
     container_name: jogojagad-frontend
     restart: unless-stopped
