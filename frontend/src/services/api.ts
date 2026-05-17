@@ -2,9 +2,8 @@ import { API_TIMEOUT_MS } from "../utils/constants";
 import { clearToken, getToken } from "../utils/token";
 import type { ApiErrorPayload } from "../types";
 
-const baseURL = import.meta.env.VITE_URL_API
-  ? `${import.meta.env.VITE_URL_API}/api`
-  : "http://127.0.0.1:8000/api";
+const apiBaseFromEnv = import.meta.env.VITE_URL_API?.replace(/\/$/, "");
+const baseURL = apiBaseFromEnv ? `${apiBaseFromEnv}/api` : "/api";
 
 function buildUrl(
   path: string,
