@@ -85,12 +85,13 @@ docker compose down -v
 cp .env.example .env
 ```
 
-2. Edit `.env` jika diperlukan:
+2. Edit `.env` sesuai environment:
 ```env
-FRONTEND_PORT=5173
+FRONTEND_PORT=4173
 APP_PORT=8080
 DB_PORT=3306
-VITE_URL_API=http://backend:80  # API URL untuk frontend
+VITE_URL_API=http://116.254.117.235:8080        # Frontend API endpoint
+CORS_ALLOWED_ORIGINS=http://116.254.117.235:4173 # CORS allowed origins
 MYSQL_DATABASE=jogojagad
 MYSQL_USER=jogojagad
 MYSQL_PASSWORD=jogojagad123
@@ -98,8 +99,13 @@ MYSQL_PASSWORD=jogojagad123
 
 **VITE_URL_API:**
 - Development: `http://localhost:8080`
-- Docker: `http://backend:80` (internal network)
-- Production: `https://your-api-domain.com`
+- Docker Local: `http://backend:80` (internal network)
+- Production: `http://116.254.117.235:8080`
+
+**CORS_ALLOWED_ORIGINS:**
+- Development: `http://localhost:5173,http://localhost:4173`
+- Production: `http://116.254.117.235:4173`
+- Multiple origins: `http://domain1:port,http://domain2:port`
 
 ---
 
@@ -127,7 +133,7 @@ JogoJagad-v2/
 - Node.js 22 Alpine
 - React + TypeScript
 - Vite build tool
-- Port: 5173
+- Port: 4173
 
 ### Backend
 - PHP 8.3 Apache
