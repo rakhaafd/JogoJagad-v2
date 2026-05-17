@@ -5,7 +5,8 @@ export interface LocationItem {
 }
 
 // Location Service - fetch from backend to avoid CORS issues
-const API_BASE = "/api";
+const apiBaseFromEnv = import.meta.env.VITE_URL_API?.replace(/\/$/, "");
+const API_BASE = apiBaseFromEnv ? `${apiBaseFromEnv}/api` : "/api";
 
 export const locationService = {
   async getProvinces(): Promise<LocationItem[]> {
