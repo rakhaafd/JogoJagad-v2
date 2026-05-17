@@ -1,0 +1,93 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: jogojagad-backend:latest
+    container_name: jogojagad-app
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: ${DB_DATABASE:-jogojagad}
+      DB_USERNAME: ${DB_USERNAME:-jogojagad}
+      DB_PASSWORD: ${DB_PASSWORD:-jogojagad123}
+    ports:
+      - "${APP_PORT:-8080}:80"
+    volumes:
+      - laravel_storage:/var/www/storage
+      - laravel_cache:/var/www/bootstrap/cache
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - backend
+
+  queue:
+    image: jogojagad-backend:latest
+    container_name: jogojagad-queue
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: ${DB_DATABASE:-jogojagad}
+      DB_USERNAME: ${DB_USERNAME:-jogojagad}
+      DB_PASSWORD: ${DB_PASSWORD:-jogojagad123}
+    command: php artisan queue:work --sleep=3 --tries=3 --timeout=120 --max-time=3600
+    volumes:
+      - laravel_storage:/var/www/storage
+      - laravel_cache:/var/www/bootstrap/cache
+    depends_on:
+      db:
+        condition: service_healthy
+      app:
+        condition: service_healthy
+    networks:
+      - backend
+
+  db:
+    image: mysql:8.4
+    container_name: jogojagad-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-jogojagad}
+      MYSQL_USER: ${DB_USERNAME:-jogojagad}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-jogojagad123}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root12345}
+    ports:
+      - "${DB_FORWARD_PORT:-3307}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p${DB_ROOT_PASSWORD:-root12345}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  laravel_storage:
+  laravel_cache:
