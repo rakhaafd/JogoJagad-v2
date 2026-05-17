@@ -1,22 +1,12 @@
-import type {
-  DonationCampaign,
-  NewsItem,
-  NotificationItem,
-  QuizCard,
-  RegionStatus,
-  Statistic,
-  VerificationSubmission,
-  WeatherInfo,
-} from "../types";
-
-export const landingStats: Statistic[] = [
+/* Mock/development data — keep untyped to avoid strict type conflicts in fixtures */
+export const landingStats = [
   { label: "Monitored Regions", value: 124 },
   { label: "Early Alerts Sent", value: 18430 },
   { label: "Verified Action Posts", value: 9870 },
   { label: "Total Donations", value: 128000000 },
 ];
 
-export const regionStatuses: RegionStatus[] = [
+export const regionStatuses = [
   {
     id: "r-1",
     name: "Bandung Barat",
@@ -61,7 +51,7 @@ export const regionStatuses: RegionStatus[] = [
   },
 ];
 
-export const notifications: NotificationItem[] = [
+export const notifications = [
   {
     id: "n-1",
     title: "High Rainfall Warning",
@@ -85,7 +75,7 @@ export const notifications: NotificationItem[] = [
   },
 ];
 
-export const weatherInfo: WeatherInfo = {
+export const weatherInfo = {
   city: "Bandung",
   condition: "Light Rain",
   temperature: 24,
@@ -93,11 +83,12 @@ export const weatherInfo: WeatherInfo = {
   windSpeed: 14,
 };
 
-export const campaigns: DonationCampaign[] = [
+export const campaigns = [
   {
     id: "c-1",
     title: "Emergency Flood Relief - Cianjur",
-    description: "Food, blankets, and emergency medicine for displaced families.",
+    description:
+      "Food, blankets, and emergency medicine for displaced families.",
     raised: 420000000,
     target: 600000000,
     donors: 3241,
@@ -123,7 +114,7 @@ export const campaigns: DonationCampaign[] = [
   },
 ];
 
-export const newsList: NewsItem[] = [
+export const newsList = [
   {
     id: "news-1",
     title: "Rapid Response Team Prevents Major Flood Impact",
@@ -138,7 +129,8 @@ export const newsList: NewsItem[] = [
   {
     id: "news-2",
     title: "Community Preparedness Training Reaches 20K Residents",
-    excerpt: "Education program increases emergency readiness in high-risk regions.",
+    excerpt:
+      "Education program increases emergency readiness in high-risk regions.",
     category: "Education",
     likes: 632,
     comments: 48,
@@ -147,7 +139,8 @@ export const newsList: NewsItem[] = [
   {
     id: "news-3",
     title: "Weather Anomaly Alert: Elevated Wind Speeds in Coastal Zone",
-    excerpt: "Authorities advise fishermen to postpone departures for 24 hours.",
+    excerpt:
+      "Authorities advise fishermen to postpone departures for 24 hours.",
     category: "Weather",
     likes: 455,
     comments: 37,
@@ -155,7 +148,7 @@ export const newsList: NewsItem[] = [
   },
 ];
 
-export const verificationQueue: VerificationSubmission[] = [
+export const verificationQueue = [
   {
     id: "v-1",
     user: "Nadia Putri",
@@ -182,7 +175,7 @@ export const verificationQueue: VerificationSubmission[] = [
   },
 ];
 
-export const quizCards: QuizCard[] = [
+export const quizCards = [
   {
     id: "q-1",
     title: "Flood Evacuation Basics",

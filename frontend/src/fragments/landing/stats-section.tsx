@@ -9,19 +9,24 @@ import { newsService } from "../../services/newsService";
 import { useCallback } from "react";
 
 export function StatsSection() {
-  const { data: regions = [], loading: regionsLoading } = useApi(
+  const { data: regions, loading: regionsLoading } = useApi(
     disasterService.regions,
   );
   const campaignsFetcher = useCallback(
     () => donationService.listCampaigns(false),
     [],
   );
-  const { data: campaigns = [], loading: campaignsLoading } =
+  const { data: campaigns, loading: campaignsLoading } =
     useApi(campaignsFetcher);
-  const { data: news = [], loading: newsLoading } = useApi(newsService.list);
+  const { data: news, loading: newsLoading } = useApi(newsService.list);
 
-  const alerts = regions.filter((region) => region.status !== "aman").length;
-  const totalDonations = campaigns.reduce(
+  const regionsList = regions ?? [];
+  const campaignsList = campaigns ?? [];
+
+  const alerts = regionsList.filter(
+    (region) => region.status !== "aman",
+  ).length;
+  const totalDonations = campaignsList.reduce(
     (sum, campaign) => sum + campaign.current_amount,
     0,
   );
@@ -40,7 +45,7 @@ export function StatsSection() {
     <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <StatCard
         title="Monitored Regions"
-        value={formatNumber(regions.length)}
+        value={formatNumber(regionsList.length)}
         subtitle="Active GIS regions"
         icon={ShieldAlert}
       />
@@ -52,7 +57,7 @@ export function StatsSection() {
       />
       <StatCard
         title="Published News"
-        value={formatNumber(news.length)}
+        value={formatNumber((news ?? []).length)}
         subtitle="Verified newsroom updates"
         icon={Trophy}
       />

@@ -1,6 +1,5 @@
 import { apiFetch } from "./api";
 import type {
-  DonationCampaignDetail,
   DonationCampaignDetailResponse,
   DonationCampaignsResponse,
   DonationCampaignUpsertPayload,

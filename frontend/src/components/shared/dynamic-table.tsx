@@ -28,7 +28,7 @@ function formatValue(value: unknown): ReactNode {
   return String(value);
 }
 
-export function DynamicTable<T extends Record<string, unknown>>({
+export function DynamicTable<T extends Record<string, any>>({
   data,
   columns,
   emptyTitle = "No data",
@@ -54,7 +54,7 @@ export function DynamicTable<T extends Record<string, unknown>>({
           <TableHeaderRow>
             {resolvedColumns.map((column) => (
               <TableHeaderCell key={String(column.key)}>
-                {column.label ?? column.key}
+                {column.label ?? String(column.key)}
               </TableHeaderCell>
             ))}
           </TableHeaderRow>

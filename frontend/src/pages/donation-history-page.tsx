@@ -139,7 +139,11 @@ export function DonationHistoryPage() {
                     size="sm"
                     variant="outline"
                     className="w-full"
-                    onClick={() => window.open(donation.checkout_url, "_blank")}
+                    onClick={() =>
+                      donation.checkout_url
+                        ? window.open(donation.checkout_url, "_blank")
+                        : undefined
+                    }
                   >
                     View Checkout
                   </Button>

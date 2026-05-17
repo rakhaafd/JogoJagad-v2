@@ -1,5 +1,6 @@
 import { Bot, Send } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import type { ReactNode } from "react";
 import { Card } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
@@ -14,7 +15,7 @@ interface ChatMessage {
 }
 
 function renderInlineText(text: string) {
-  const parts: Array<string | JSX.Element> = [];
+  const parts: Array<string | ReactNode> = [];
   const boldPattern = /\*\*(.+?)\*\*/g;
   let lastIndex = 0;
   let match: RegExpExecArray | null;

@@ -4,6 +4,7 @@ import { cn } from "../../utils/cn";
 interface BadgeProps extends PropsWithChildren {
   tone?: "default" | "safe" | "warning" | "danger";
   className?: string;
+  variant?: "solid" | "outline";
 }
 
 const toneClass: Record<NonNullable<BadgeProps["tone"]>, string> = {

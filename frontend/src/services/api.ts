@@ -56,20 +56,20 @@ export async function apiFetch<TResponse, TBody = unknown>(
 ) {
   const { method = "GET", body, headers, query, auth = true, signal } = options;
   const token = getToken();
-  const requestHeaders: HeadersInit = {
+  const requestHeaders = new Headers({
     Accept: "application/json",
-    ...headers,
-  };
+    ...(headers as Record<string, string> | undefined),
+  });
 
   const payload = body ?? undefined;
   const shouldSendJson =
     payload && !isFormData(payload) && typeof payload !== "string";
   if (shouldSendJson) {
-    requestHeaders["Content-Type"] = "application/json";
+    requestHeaders.set("Content-Type", "application/json");
   }
 
   if (auth && token) {
-    requestHeaders.Authorization = `Bearer ${token}`;
+    requestHeaders.set("Authorization", `Bearer ${token}`);
   }
 
   const controller = new AbortController();

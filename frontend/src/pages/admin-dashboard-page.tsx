@@ -18,25 +18,32 @@ export function AdminDashboardPage() {
   const newsFetcher = useCallback(() => newsService.list(), []);
 
   const {
-    data: actions = [],
+    data: actions,
     loading: actionsLoading,
     error: actionsError,
   } = useApi(actionsFetcher);
   const {
-    data: regions = [],
+    data: regions,
     loading: regionsLoading,
     error: regionsError,
   } = useApi(disasterService.regions);
-  const { data: campaigns = [], loading: campaignsLoading } =
+  const { data: campaigns, loading: campaignsLoading } =
     useApi(campaignsFetcher);
-  const { data: news = [] } = useApi(newsFetcher);
+  const { data: news } = useApi(newsFetcher);
+
+  const actionsList = actions ?? [];
+  const regionsList = regions ?? [];
+  const campaignsList = campaigns ?? [];
+  const newsList = news ?? [];
 
   const analytics = useMemo(() => {
-    const alerts = regions.filter((region) => region.status !== "aman").length;
-    const verifiedActions = actions.filter(
+    const alerts = regionsList.filter(
+      (region) => region.status !== "aman",
+    ).length;
+    const verifiedActions = actionsList.filter(
       (action) => action.status === "verified",
     ).length;
-    const donationTotal = campaigns.reduce(
+    const donationTotal = campaignsList.reduce(
       (sum, campaign) => sum + campaign.current_amount,
       0,
     );
@@ -46,14 +53,14 @@ export function AdminDashboardPage() {
       date.setDate(date.getDate() - (6 - index));
       const label = date.toLocaleDateString("id-ID", { weekday: "short" });
       const dateKey = date.toISOString().slice(0, 10);
-      const alertsCount = regions.filter((region) =>
+      const alertsCount = regionsList.filter((region) =>
         region.updated_at.startsWith(dateKey),
       ).length;
-      const verifiedCount = actions.filter(
+      const verifiedCount = actionsList.filter(
         (action) =>
           action.created_at.startsWith(dateKey) && action.status === "verified",
       ).length;
-      const campaignCount = campaigns.filter((campaign) =>
+      const campaignCount = campaignsList.filter((campaign) =>
         campaign.created_at.startsWith(dateKey),
       ).length;
 
@@ -85,7 +92,7 @@ export function AdminDashboardPage() {
       />
       <div className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr]">
         <VerificationTable
-          actions={actions}
+          actions={actionsList}
           loading={actionsLoading}
           error={actionsError}
         />
@@ -96,16 +103,16 @@ export function AdminDashboardPage() {
             disaster updates.
           </p>
           <div className="rounded-xl border border-border bg-muted/25 p-3 text-sm text-muted-foreground">
-            {campaigns.length} active donation campaigns monitored.
+            {campaignsList.length} active donation campaigns monitored.
           </div>
           <div className="rounded-xl border border-border bg-muted/25 p-3 text-sm text-muted-foreground">
-            {news.length} news posts available for moderation.
+            {newsList.length} news posts available for moderation.
           </div>
         </Card>
       </div>
       <MonitoringMap
         compact
-        regions={regions}
+        regions={regionsList}
         loading={regionsLoading}
         error={regionsError}
       />

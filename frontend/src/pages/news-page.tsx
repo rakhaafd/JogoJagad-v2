@@ -12,9 +12,10 @@ import { newsService } from "../services/newsService";
 import { getStorageUrl } from "../utils/storage";
 
 export function NewsPage() {
-  const { data: news = [], loading, error } = useApi(newsService.list);
-  const featured = news[0] ?? null;
-  const nonFeatured = news.slice(1);
+  const { data: news, loading, error } = useApi(newsService.list);
+  const newsList = news ?? [];
+  const featured = newsList[0] ?? null;
+  const nonFeatured = newsList.slice(1);
 
   return (
     <div className="space-y-4">

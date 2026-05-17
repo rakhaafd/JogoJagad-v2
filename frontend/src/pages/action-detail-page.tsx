@@ -42,7 +42,11 @@ export function ActionDetailPage() {
     [id],
   );
 
-  const { data: action, loading, error } = useApi(fetcher, { immediate: !!id });
+  const {
+    data: action,
+    loading,
+    error,
+  } = useApi<ActionReport>(fetcher, { immediate: !!id });
 
   useEffect(() => {
     if (action && !editData) {
@@ -90,7 +94,7 @@ export function ActionDetailPage() {
 
   const handleCancel = useCallback(() => {
     setIsEditing(false);
-    setEditData(action);
+    setEditData(action ? (action as Partial<ActionReport>) : null);
     setSelectedFile(null);
   }, [action]);
 

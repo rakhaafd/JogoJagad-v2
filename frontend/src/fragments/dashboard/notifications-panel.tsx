@@ -16,12 +16,14 @@ export function NotificationsPanel() {
   }, [user]);
 
   const {
-    data: notifications = [],
+    data: notifications,
     loading,
     error,
   } = useApi(fetcher, {
     immediate: Boolean(user),
   });
+
+  const notificationsList = notifications ?? [];
 
   return (
     <Card className="space-y-4">
@@ -29,7 +31,7 @@ export function NotificationsPanel() {
         <h3 className="inline-flex items-center gap-2 text-lg font-semibold">
           <Bell className="h-4 w-4 text-primary" /> Notifications
         </h3>
-        <Badge>{notifications.length} New</Badge>
+        <Badge>{notificationsList.length} New</Badge>
       </div>
       <div className="space-y-3">
         {loading ? (
@@ -39,13 +41,13 @@ export function NotificationsPanel() {
           </div>
         ) : error ? (
           <div className="text-sm text-danger">{error}</div>
-        ) : notifications.length === 0 ? (
+        ) : notificationsList.length === 0 ? (
           <EmptyState
             title="No active notifications"
             message="Your monitored regions are currently stable."
           />
         ) : (
-          notifications.map((item) => (
+          notificationsList.map((item) => (
             <div
               key={item.id}
               className="rounded-xl border border-border bg-muted/30 p-3"
