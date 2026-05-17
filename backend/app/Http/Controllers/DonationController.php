@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Donation;
 use App\Models\DonationCampaign;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -41,28 +43,42 @@ class DonationController extends Controller
         $user = $request->user();
         $externalId = 'don-' . Str::uuid()->toString();
 
-        $xenditApiKey = env('XENDIT_KEY');
+        $xenditApiKey = config('services.xendit.key');
         if (!$xenditApiKey) {
             return response(['message' => 'Payment gateway belum dikonfigurasi.'], 500);
         }
 
-        // Call Xendit API natively
-        $response = Http::withBasicAuth($xenditApiKey, '')
-            ->post('https://api.xendit.co/v2/invoices', [
-                'external_id' => $externalId,
-                'amount' => $amount,
-                'description' => "Donasi: " . $campaign->title,
-                'customer' => [
-                    'given_names' => $user->name ?? 'Anonim',
-                    'email' => $user->email ?? '',
-                ],
-                // Ganti dengan URL Frontend kamu sesuai kebutuhan nanti
-                'success_redirect_url' => url('/'),
-            ]);
+        $xenditBaseUrl = rtrim(config('services.xendit.base_url', 'https://api.xendit.co'), '/');
+
+        try {
+            // Call Xendit API natively
+            $response = Http::timeout(15)
+                ->withBasicAuth($xenditApiKey, '')
+                ->post($xenditBaseUrl . '/v2/invoices', [
+                    'external_id' => $externalId,
+                    'amount' => $amount,
+                    'description' => 'Donasi: ' . $campaign->title,
+                    'customer' => [
+                        'given_names' => $user->name ?? 'Anonim',
+                        'email' => $user->email ?? '',
+                    ],
+                    'success_redirect_url' => url('/'),
+                ]);
+        } catch (ConnectionException $exception) {
+            Log::error('Xendit connection failed: ' . $exception->getMessage());
+
+            return response(['message' => 'Payment gateway tidak dapat dihubungi.'], 503);
+        }
 
         if (!$response->ok()) {
-            \Illuminate\Support\Facades\Log::error('Xendit Error: ' . $response->body());
-            return response(['message' => 'Gagal membuat tagihan pembayaran.'], 500);
+            Log::error('Xendit Error: ' . $response->body());
+
+            $errorPayload = $response->json();
+            $errorMessage = is_array($errorPayload) && isset($errorPayload['message'])
+                ? $errorPayload['message']
+                : 'Gagal membuat tagihan pembayaran.';
+
+            return response(['message' => $errorMessage], 502);
         }
 
         $xenditData = $response->json();
@@ -99,7 +115,7 @@ class DonationController extends Controller
     public function webhook(Request $request): Response
     {
         // Xendit Webhook Verification if callback token is set (optional but recommended)
-        $xenditCallbackToken = env('XENDIT_CALLBACK_TOKEN');
+        $xenditCallbackToken = config('services.xendit.callback_token');
         if ($xenditCallbackToken && $request->header('x-callback-token') !== $xenditCallbackToken) {
             return response(['message' => 'Invalid Callback Token'], 403);
         }
