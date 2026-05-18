@@ -14,4 +14,11 @@ if [ ! -L /var/www/public/storage ]; then
   php artisan storage:link || true
 fi
 
+if [ -f /var/www/.env ] && grep -q '^APP_KEY=$' /var/www/.env; then
+  php artisan key:generate --force --no-interaction
+fi
+
+php artisan optimize:clear || true
+php artisan config:cache || true
+
 exec "$@"

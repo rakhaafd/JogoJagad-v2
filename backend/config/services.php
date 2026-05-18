@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'xendit' => [
+        'key' => env('XENDIT_KEY'),
+        'callback_token' => env('XENDIT_CALLBACK_TOKEN'),
+        'base_url' => env('XENDIT_BASE_URL', 'https://api.xendit.co'),
+    ],
+
 ];

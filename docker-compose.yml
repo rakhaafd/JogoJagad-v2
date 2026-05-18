@@ -46,9 +46,8 @@ services:
     ports:
       - "${APP_PORT:-8080}:80"
     volumes:
-        - ./backend/.env:/var/www/.env
+      - ./backend/.env:/var/www/.env
       - laravel_storage:/var/www/storage
-      - laravel_cache:/var/www/bootstrap/cache
     depends_on:
       db:
         condition: service_healthy
@@ -78,9 +77,8 @@ services:
       DB_PASSWORD: ${MYSQL_PASSWORD:-jogojagad123}
     command: php artisan queue:work --tries=3
     volumes:
-        - ./backend/.env:/var/www/.env
+      - ./backend/.env:/var/www/.env
       - laravel_storage:/var/www/storage
-      - laravel_cache:/var/www/bootstrap/cache
     depends_on:
       db:
         condition: service_healthy
@@ -111,7 +109,6 @@ services:
 volumes:
   mysql_data:
   laravel_storage:
-  laravel_cache:
 
 networks:
   jogojagad:
